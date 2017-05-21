@@ -14,10 +14,16 @@ public:
 	virtual bool init();
 	// 将屏幕坐标转换为TileMap坐标，暂时没用
 	Vec2 tileCoordForPosition(Vec2 position);
+	//求方格的中心坐标  
+	Vec2 centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord);
    //判断键盘是否按住
 	bool isKeyPressed(EventKeyboard::KeyCode code);
 	//键盘按下后的事情
 	void keyPressedDuration(EventKeyboard::KeyCode code);
+  //精灵永远执行这个动作
+	void ForeverMove(EventKeyboard::KeyCode code);
+	//通过动画名字得到相应的动画
+	Animate* getAnimateByName(std::string animName, float delay, int animNum);
 	//更新位置
 	void UpdatePosition(float delta);
 	// 回调更新函数，该函数每一帧都会调用
@@ -30,6 +36,12 @@ private:
 	TMXTiledMap* map;  // 地图
 	Sprite* _player;  // 玩家精灵
 	TMXLayer* _collidable;  // 障碍层
+	Vector<Sprite* > _popVector;
+	//向左、右、上、下的静态图片，当向对应方向移动时，用此贴图进行替换
+	CCTexture2D *_player_texture_left;
+	CCTexture2D *_player_texture_right;
+	CCTexture2D *_player_texture_up;
+	CCTexture2D *_player_texture_down;
 };
 
 #endif

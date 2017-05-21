@@ -1,5 +1,6 @@
 #include "AppDelegate.h"
 #include "BeginScene.h"
+
 USING_NS_CC;
 
 static cocos2d::Size designResolutionSize = cocos2d::Size(960, 720);
@@ -72,11 +73,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     register_all_packages();
+	director->setContentScaleFactor(960 / 720);
 
-    // create a scene. it's an autorelease object
     auto scene = BeginScene::createScene();
 
-    // run
     director->runWithScene(scene);
 
     return true;

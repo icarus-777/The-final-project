@@ -29,7 +29,7 @@ bool BeginScene::init()
 	//游戏初始界面
 	auto* background = Sprite::create("BeginScene.png");
 	background->setPosition(size.width / 2, size.height / 2);  //设置位置
-	background->setScale(1.6f);//大小
+	background->setScale(1.5f);//大小
 	addChild(background, 0); //添加到场景
 
 	//开始游戏按钮
