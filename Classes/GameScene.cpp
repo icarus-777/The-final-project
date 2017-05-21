@@ -25,30 +25,35 @@ bool GameScene::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	//显示地图
-	  map = TMXTiledMap::create("cnm.tmx");
+	  map = TMXTiledMap::create("Map.tmx");
 	  // 把地图的锚点和位置都设置为原点，这样可以使地图的左下角与屏幕的左下角对齐
 	//设置地图的锚点
 	map->setAnchorPoint(Vec2::ZERO);
 	//设置地图位置
 	map->setPosition(0, 0);
-	map->setScale(1.5f);
+	map->setScale(1.6f);
     addChild(map, 0);
-	_collidable = map->getLayer("collidable");//获得障碍层
-	_collidable->setVisible(false);//设置不可见
+
+	// 获取障碍层，并设置障碍层不可见
+	_collidable = map->getLayer("collidable");
+	_collidable->setVisible(false);
+
+	// ①获取精灵帧缓存的单例对象，并读取animation.plist文件将精灵帧纹理添加到精灵帧缓存当中
+	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("player.plist");
 	//一个玩家
-	_player = Sprite::create("player_down_1.png");
-	//设置玩家锚点
-	_player->setAnchorPoint(Vec2(0.5,0.3));
+	auto objects = map->getObjectGroup("Object");
+	ValueMap mapPlayer = objects->getObject("player");
+	int x = mapPlayer.at("x").asInt();
+	int y = mapPlayer.at("y").asInt();
+	_player = Player::create("player_down_1.png");
 	// 设置位置并添加为地图的子节点
-	_player->setPosition(40, 40 );
-	_player->setScale(0.8f);
-	//遮挡效果实现将所有需要被玩家遮挡的物体的zOrder值都设置成<2，所以玩家的zOrder设计成2，就可以实现遮挡效果了。											  
-	map->addChild(_player, 2);
-	//将四个方向的移动图加入缓存
-	_player_texture_left = CCTextureCache::sharedTextureCache()->addImage("player_left_1.png");
-	_player_texture_right = CCTextureCache::sharedTextureCache()->addImage("player_right_1.png");
-	_player_texture_up = CCTextureCache::sharedTextureCache()->addImage("player_up_1.png");
-	_player_texture_down = CCTextureCache::sharedTextureCache()->addImage("player_down_1.png");
+	_player->setPosition(x, y);
+	//遮挡效果实现将所有需要被玩家遮挡的物体的zOrder值都设置成<2，所以玩家的zOrder设计成2，就可以实现遮挡效果了。	
+	_player->setAnchorPoint(_player->getAnchorPoint() +Vec2(0,-0.5) );
+	map->addChild(_player, getZorder());
+	//获取障碍层，并设置障碍层为不可见
+	_collidable = map->getLayer("collidable");
+	_collidable->setVisible(false);
 	// 创建键盘事件监听器
 	auto keyBoardListener = EventListenerKeyboard::create();
 	//当键被按下，map中这个键的值被设为true
@@ -117,7 +122,7 @@ void GameScene::UpdatePosition(float delta) {
 		rightArrow = EventKeyboard::KeyCode::KEY_RIGHT_ARROW,
 		upArrow = EventKeyboard::KeyCode::KEY_UP_ARROW,
 		downArrow = EventKeyboard::KeyCode::KEY_DOWN_ARROW,
-	    space = EventKeyboard::KeyCode::KEY_SPACE;
+	space = EventKeyboard::KeyCode::KEY_SPACE;
 
 	int arrow = isKeyPressed(leftArrow) + isKeyPressed(rightArrow) + isKeyPressed(upArrow) + isKeyPressed(downArrow);
 
@@ -126,6 +131,7 @@ void GameScene::UpdatePosition(float delta) {
 		keyPressedDuration(space);
 		keys[space] = false;
 	}
+
 	//按下方向键，玩家移动
 	if (isKeyPressed(leftArrow)) {
 		keyPressedDuration(leftArrow);
@@ -138,9 +144,6 @@ void GameScene::UpdatePosition(float delta) {
 	}
 	else if (isKeyPressed(downArrow)) {
 		keyPressedDuration(downArrow);
-	}
-	else if (isKeyPressed(space)) {
-		keyPressedDuration(space);
 	}
 }
 
@@ -168,13 +171,13 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
 		offsetY -= 2;
 		break;
-	case EventKeyboard::KeyCode::KEY_SPACE: 
+	case EventKeyboard::KeyCode::KEY_SPACE:
 		//玩家位置
 		Vec2 _tilePlayer = tileCoordForPosition(_player->getPosition());
 		Vec2 _popPosition = centerPositionForTileCoord(_tilePlayer);
 
 		SpriteFrameCache::getInstance()->addSpriteFramesWithFile("popo.plist");
-		
+
 		//放置一个泡泡在格子的中心
 		Sprite* pop = Sprite::createWithSpriteFrameName("pop_1.png");
 		pop->setAnchorPoint(Vec2(0.5, 0.5));
@@ -187,7 +190,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 		DelayTime * _delayDelete = DelayTime::create(3.0f);
 		DelayTime *e = DelayTime::create(0.5f);
 		auto callFunc1 = CallFunc::create([=] {
-			
+
 			// ②使用精灵帧缓存中的精灵创建一个动画，并设置属性
 			auto animation = Animation::create();
 			// 循环从精灵帧缓存中获取与图片名称相对应的精灵帧组成动画
@@ -239,11 +242,11 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 				rightWaterLength = power,
 				upWaterLength = power,
 				downWaterLength = power;
-			
+
 			//判断水柱长度是多少
 			for (int i = 0; i <= leftWaterLength; i++)
 			{
-				if (0==1)//缺一个函数
+				if (0 == 1)//缺一个函数
 				{
 					leftWaterLength = i;
 					break;
@@ -251,21 +254,21 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 			}
 
 			for (int i = 0; i <= rightWaterLength; i++)
-				if (0==1)
+				if (0 == 1)
 				{
 					rightWaterLength = i;
 					break;
 				}
 
 			for (int i = 0; i <= upWaterLength; i++)
-				if (0==1)
+				if (0 == 1)
 				{
 					upWaterLength = i;
 					break;
 				}
 
 			for (int i = 0; i <= downWaterLength; i++)
-				if (0==1)
+				if (0 == 1)
 				{
 					downWaterLength = i;
 					break;
@@ -301,7 +304,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 						auto delay = DelayTime::create(0.f);
 						auto action = Sequence::create(delay, animate, hide, NULL);
 						rightAction.pushBack(action);
-					}	
+					}
 				}
 			}
 
@@ -452,33 +455,67 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 			_popVector.eraseObject(pop);
 		});
 		//创建一个序列动作，放置泡泡->泡泡加入泡泡vector->泡泡爆炸
-		auto action = Sequence::create(callFunc1, _delayDelete, callFunc2, e,callFunc3,NULL);
+		auto action = Sequence::create(callFunc1, _delayDelete, callFunc2, e, callFunc3, NULL);
 		pop->runAction(action);
 		break;
 	}
-		auto moveTo = MoveTo::create(0.06, _player->getPosition() + Vec2(offsetX, offsetY));
+	if(offsetX<0)
+	rightMove(offsetX, offsetY,2,2,6);
+	if(offsetX>0)
+		rightMove(offsetX, offsetY, 3, 3, 7);
+	if(offsetY<0)
+		rightMove(offsetX, offsetY, 0, 6, 7);
+	if(offsetY>0)
+		rightMove(offsetX, offsetY, 1, 4, 5);
+	//获取正确的遮挡效果
+	_player->setZOrder(getZorder());
+}
+
+void GameScene::rightMove(int offsetX,int offsetY,int flag1,int flag2,int flag3)
+{
+	CC_CONTENT_SCALE_FACTOR();
+	auto destination = _player->getPosition() + Vec2(offsetX, offsetY);
+	auto moveTo = MoveTo::create(0.06, destination);
+	auto tmp=tileCoordForPosition(destination);
+	auto delt=15;
+	Vec2 tileCoord[8];//0 下,1 上, 2 左, 3 右 ,4 左上, 5 右上, 6 左下, 7 右下
+	tileCoord[0] = tileCoordForPosition(destination );
+	tileCoord[1] = tileCoordForPosition(destination + Vec2(0, 2*delt));
+	tileCoord[2] = tileCoordForPosition(destination + Vec2(-delt, delt));
+	tileCoord[3] = tileCoordForPosition(destination + Vec2(delt, delt));
+	tileCoord[4] = tileCoordForPosition(destination + Vec2(-delt, 2*delt));
+	tileCoord[5] = tileCoordForPosition(destination + Vec2(delt, 2*delt));
+	tileCoord[6] = tileCoordForPosition(destination + Vec2(-delt, 0)); 
+	tileCoord[7] = tileCoordForPosition(destination + Vec2(delt, 0));
+	if (!collide(tileCoord[flag1]) && !collide(tileCoord[flag2]) && !collide(tileCoord[flag3]))
 		_player->runAction(moveTo);
+	else
+		_player->runAction(MoveTo::create(0.06, _player->getPosition() + Vec2(-offsetX/2, -offsetY/2)));
 }
-// 将屏幕坐标转换为TileMap坐标，暂时没用
-Vec2 GameScene::tileCoordForPosition(Vec2 position)
-{// CC_CONTENT_SCALE_FACTOR Retina返回2，否则返回1
- // 玩家位置的x除以地图的宽，得到的是地图横向的第几个格子（tile）
- // 地图宽计算：26[格子] * 64[图块的宽] = 1680[地图宽]
- // 假如精灵在的x坐标是640，则精灵所在地图的格子计算：640[精灵位置] / 64[图块的宽] = 10 [格子]
-	int x = (int)(position.x / (map->getTileSize().width / CC_CONTENT_SCALE_FACTOR()));
-	// 玩家位置的y除以地图的高，得到的是地图纵向第几个格子（tile），
-	// 但是因为cocos2d-x的y轴（左下角）和TileMap的y轴（左上角）轴相反，所以使用地图的高度减去玩家位置的y
-	float pointHeight = map->getTileSize().height / CC_CONTENT_SCALE_FACTOR();
-	int y = (int)((map->getMapSize().height * pointHeight - position.y) / pointHeight);
-	return Vec2(x,y);
-}
-//方格的中心坐标
 Vec2 GameScene::centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord) {
 	Size mapSize = map->getMapSize();//TileMap坐标的行数，列数
-	Size tileSize =map->getTileSize();//图块大小
+	Size tileSize = map->getTileSize();//图块大小
 	int x = TileCoord.x * tileSize.width + tileSize.width / 2;
 	int y = (mapSize.height - TileCoord.y)*tileSize.height - tileSize.height / 2;
 	return Vec2(x, y);
+}
+
+bool GameScene::collide(Vec2 position)
+{
+	//使用tileGid函数获取TileMap坐标系里的GID，GID是“全局唯一标示”
+	int tileGid = _collidable->getTileGIDAt(position);
+	if (tileGid)
+	{
+		Value properties = map->getPropertiesForGID(tileGid);
+		ValueMap valueMap = properties.asValueMap();
+		//查找ValueMap，如果有可碰撞物体，直接返回
+		std::string value = valueMap.at("collidable").asString();
+		if (value.compare("true") == 0)
+		{
+			return 1;
+		}
+	}
+	return 0;
 }
 void GameScene::ForeverMove(EventKeyboard::KeyCode code) {
 
@@ -516,12 +553,27 @@ Animate * GameScene::getAnimateByName(std::string animName, float delay, int ani
 		frameName.append(StringUtils::format("%d", i)).append(".png");
 		animation->addSpriteFrameWithFile(frameName.c_str());
 	}
-		//设置动画延时
-		animation->setDelayPerUnit(delay);
+	//设置动画延时
+	animation->setDelayPerUnit(delay);
 
-		//在播放完动画时恢复到初始帧
-		animation->setRestoreOriginalFrame(true);
-		Animate* animate = Animate::create(animation);
+	//在播放完动画时恢复到初始帧
+	animation->setRestoreOriginalFrame(true);
+	Animate* animate = Animate::create(animation);
 
-		return animate;
+	return animate;
 }
+
+// 将屏幕坐标转换为TileMap坐标，暂时没用
+Vec2 GameScene::tileCoordForPosition(Vec2 position)
+{// CC_CONTENT_SCALE_FACTOR Retina返回2，否则返回1
+ // 玩家位置的x除以地图的宽，得到的是地图横向的第几个格子（tile）
+ // 地图宽计算：26[格子] * 64[图块的宽] = 1680[地图宽]
+ // 假如精灵在的x坐标是640，则精灵所在地图的格子计算：640[精灵位置] / 64[图块的宽] = 10 [格子]
+	int x = (int)(position.x / (map->getTileSize().width / CC_CONTENT_SCALE_FACTOR()));
+	// 玩家位置的y除以地图的高，得到的是地图纵向第几个格子（tile），
+	// 但是因为cocos2d-x的y轴（左下角）和TileMap的y轴（左上角）轴相反，所以使用地图的高度减去玩家位置的y
+	float pointHeight = map->getTileSize().height / CC_CONTENT_SCALE_FACTOR();
+	int y = (int)((map->getMapSize().height * pointHeight - position.y) / pointHeight);
+	return Vec2(x,y);
+}
+
