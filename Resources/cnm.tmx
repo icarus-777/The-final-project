@@ -13,4 +13,14 @@
    eJxjYmBgYBrFo3iEYgBGHgGB
   </data>
  </layer>
+ <layer name="house" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYMAOuHCIEwuUKdSPC9DLXVw42OTYQ6uwwAUGa9yBwGBzGwCw5wEP
+  </data>
+ </layer>
+ <layer name="collidable" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKANUKWRuZQCerlLFQd7KIDB7F5quw0AWCcA3w==
+  </data>
+ </layer>
 </map>

@@ -36,7 +36,8 @@ private:
 	TMXTiledMap* map;  // 地图
 	Sprite* _player;  // 玩家精灵
 	TMXLayer* _collidable;  // 障碍层
-	Vector<Sprite* > _popVector;
+	Vector<Sprite* > _popVector;//泡泡层
+	int power = 2;//泡泡威力
 	//向左、右、上、下的静态图片，当向对应方向移动时，用此贴图进行替换
 	CCTexture2D *_player_texture_left;
 	CCTexture2D *_player_texture_right;
