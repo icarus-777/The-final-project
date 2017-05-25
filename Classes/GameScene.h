@@ -1,8 +1,6 @@
 #ifndef __GAME_SCENE_H__
 #define __GAME_SCENE_H__
-
 #include "cocos2d.h"
-
 USING_NS_CC;
 
 class GameScene : public cocos2d::Layer
@@ -14,22 +12,32 @@ public:
 	virtual bool init();
 	// 将屏幕坐标转换为TileMap坐标，暂时没用
 	Vec2 tileCoordForPosition(Vec2 position);
-	//求方格的中心坐标  
-	Vec2 centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord);
    //判断键盘是否按住
 	bool isKeyPressed(EventKeyboard::KeyCode code);
+	//求方格的中心坐标  
+	Vec2 centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord);
+	//精灵永远执行这个动作
+	void ForeverMove(EventKeyboard::KeyCode code);
 	//键盘按下后的事情
 	void keyPressedDuration(EventKeyboard::KeyCode code);
-  //精灵永远执行这个动作
-	void ForeverMove(EventKeyboard::KeyCode code);
-	//通过动画名字得到相应的动画
-	Animate* getAnimateByName(std::string animName, float delay, int animNum);
 	//更新位置
 	void UpdatePosition(float delta);
+	//获取player当前应有的zorder
+	int getZorder() { return tileCoordForPosition(_player->getPosition()).y; }
+	//通过动画名字得到相应的动画
+	Animate* getAnimateByName(std::string animName, float delay, int animNum);
+	/**
+	*以player脚底中心为锚点，以身体中心为原点
+	*建立八个检测点，每次传入需要使用的点
+	*进行检测，如果下一步要碰到障碍物，则停止并后退1像素（防止卡住）
+	*/
+	void rightMove(int offsetX,int offsetY,int flag1,int flag2,int flag3);
 	// 回调更新函数，该函数每一帧都会调用
 	void update(float delta);
 	//使用CREATE_FUNC宏创建当前类的对象，返回的对象将会由自动释放池管理内存的释放
 	CREATE_FUNC(GameScene);
+	///判断是否会碰到障碍物
+	bool collide(Vec2 position);
 private:
 	//键盘按键记录
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
