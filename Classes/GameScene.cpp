@@ -37,9 +37,8 @@ bool GameScene::init()
 	// 获取障碍层，并设置障碍层不可见
 	_collidable = map->getLayer("collidable");
 	_collidable->setVisible(false);
-
-	// ①获取精灵帧缓存的单例对象，并读取animation.plist文件将精灵帧纹理添加到精灵帧缓存当中
-	SpriteFrameCache::getInstance()->addSpriteFramesWithFile("player.plist");
+	_boxbottom = map->getLayer("boxbottom");
+	_layerNames.pushBack(map->getLayer("boxtop"));
 	//一个玩家
 	auto objects = map->getObjectGroup("Object");
 	ValueMap mapPlayer = objects->getObject("player");
@@ -48,17 +47,44 @@ bool GameScene::init()
 	_player =Sprite::create("player_down_1.png");
 	// 设置位置并添加为地图的子节点
 	_player->setPosition(x, y);
-	//遮挡效果实现将所有需要被玩家遮挡的物体的zOrder值都设置成<2，所以玩家的zOrder设计成2，就可以实现遮挡效果了。	
 	_player->setAnchorPoint(_player->getAnchorPoint() +Vec2(0,-0.5) );
-	map->addChild(_player, getZorder());
-	//获取障碍层，并设置障碍层为不可见
-	_collidable = map->getLayer("collidable");
-	_collidable->setVisible(false);
+	map->addChild(_player,4);
 	//将四个方向的移动图片加入缓存
 	_player_texture_left = CCTextureCache::sharedTextureCache()->addImage("player_left_1.png");
 	_player_texture_right = CCTextureCache::sharedTextureCache()->addImage("player_right_1.png");
 	_player_texture_up = CCTextureCache::sharedTextureCache()->addImage("player_up_1.png");
 	_player_texture_down = CCTextureCache::sharedTextureCache()->addImage("player_down_1.png");
+	//在breakable的block上放一个精灵 这样就可以发生碰撞
+	int breakableBlocks[13][17] = {
+		//0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
+		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //0
+		{ 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0 }, //1
+		{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0 }, //2
+		{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }, //3
+		{ 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0 }, //4
+		{ 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0 }, //5
+		{ 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0 }, //6
+		{ 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0 }, //7
+		{ 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0 }, //8
+		{ 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //9
+		{ 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0 }, //10
+		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //11 
+	};
+
+	for (int i = 0; i < 13; i++)
+	{
+		for (int j = 0; j < 17; j++)
+		{
+			if (breakableBlocks[i][j] == 1)
+			{
+				auto test = Sprite::create();
+				test->setAnchorPoint(Vec2(0.5, 0.5));
+				test->setPosition(centerPositionForTileCoord(Vec2(j, i)));
+				_breakableBlockVector.pushBack(test);
+				map->addChild(test, 5);
+			}
+		}
+	}
 	// 创建键盘事件监听器
 	auto keyBoardListener = EventListenerKeyboard::create();
 	//当键被按下，map中这个键的值被设为true
@@ -249,31 +275,31 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 				downWaterLength = power;
 
 			//判断水柱长度是多少
-			for (int i = 0; i <= leftWaterLength; i++)
+			for (int i = 0; i < leftWaterLength; i++)
 			{
-				if (0 == 1)//缺一个函数
+				if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x - i - 1, tileCoordForPosition(popx->getPosition()).y), POP))//缺一个函数
 				{
 					leftWaterLength = i;
 					break;
 				}
 			}
 
-			for (int i = 0; i <= rightWaterLength; i++)
-				if (0 == 1)
+			for (int i = 0; i < rightWaterLength; i++)
+				if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x + i +1, tileCoordForPosition(popx->getPosition()).y), POP))
 				{
 					rightWaterLength = i;
 					break;
 				}
 
-			for (int i = 0; i <= upWaterLength; i++)
-				if (0 == 1)
+			for (int i = 0; i < upWaterLength; i++)
+				if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x, tileCoordForPosition(popx->getPosition()).y - i - 1), POP))
 				{
 					upWaterLength = i;
 					break;
 				}
 
-			for (int i = 0; i <= downWaterLength; i++)
-				if (0 == 1)
+			for (int i = 0; i < downWaterLength; i++)
+				if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x, tileCoordForPosition(popx->getPosition()).y + i + 1), POP))
 				{
 					downWaterLength = i;
 					break;
@@ -449,8 +475,77 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 				downSprite.eraseObject(sprite);
 				downAction.eraseObject(action);
 			}
+			//泡泡位置
+			Vec2 popPositionForTileMap = tileCoordForPosition(popPosition);
+			Sprite* Up;//被炸物的上半部分
 
+			Sprite* emptySprite = Sprite::create();//空精灵
+			emptySprite->setPosition(Vec2(-1, -1));
+			Vec2 _BubblePosition[4];
+			//四个爆炸位置
+			if (leftWaterLength == power)
+			{
+				_BubblePosition[0] = popPositionForTileMap - Vec2(leftWaterLength, 0);
+			}
+			else
+			{
+				_BubblePosition[0] = popPositionForTileMap - Vec2(leftWaterLength + 1, 0);
+			}
+			if (rightWaterLength == power)
+			{
+				_BubblePosition[1] = popPositionForTileMap + Vec2(rightWaterLength, 0);
+			}
+			else
+			{
+				_BubblePosition[1] = popPositionForTileMap + Vec2(rightWaterLength + 1, 0);
+			}
+			if (upWaterLength == power)
+			{
+				_BubblePosition[2] = popPositionForTileMap - Vec2(0, upWaterLength);
+			}
+			else
+			{
+				_BubblePosition[2] = popPositionForTileMap - Vec2(0, upWaterLength + 1);
+			}
+			if (downWaterLength == power)
+			{
+				_BubblePosition[3] = popPositionForTileMap + Vec2(0, downWaterLength);
+			}
+			else
+			{
+				_BubblePosition[3] = popPositionForTileMap + Vec2(0, downWaterLength + 1);
+			}
+			int _GID[4];//GID
+			Vector<Sprite*> _erasePopvector;//临时被摧毁建筑数组
+			for (int i = 0; i < 4; i++)
+			{
+				//四个方向的爆炸，没有建筑就加一个空的精灵
+				if (_boxbottom->getTileAt(_BubblePosition[i]) != nullptr)
+				{
+					_erasePopvector.pushBack(_boxbottom->getTileAt(_BubblePosition[i]));
+				}
+				else
+				{
+					_erasePopvector.pushBack(emptySprite);
+				}
 
+				
+				_GID[i] = _boxbottom->getTileGIDAt(_BubblePosition[i]);
+                //建筑要被设置为不可见
+				if (_GID[i])
+				{
+					_erasePopvector.at(i)->setVisible(false);//下半部分
+					Value properties = map->getPropertiesForGID(_GID[i]);
+					ValueMap valuemap = properties.asValueMap();
+					std::string value = valuemap.at("breakable").asString();
+					if (value == "true")
+					{
+						Up = _layerNames.at(0)->getTileAt(_BubblePosition[i] + Vec2(0, -1));//上半部分
+						Up->setVisible(false);
+					}
+				}
+			}
+			_erasePopvector.clear();
 
 		});
 		auto callFunc3 = CallFunc::create([=] {
@@ -472,8 +567,6 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 		rightMove(offsetX, offsetY, 0, 6, 7);
 	if(offsetY>0)
 		rightMove(offsetX, offsetY, 1, 4, 5);
-	//获取正确的遮挡效果
-	_player->setZOrder(getZorder());
 }
 
 void GameScene::rightMove(int offsetX,int offsetY,int flag1,int flag2,int flag3)
@@ -492,10 +585,8 @@ void GameScene::rightMove(int offsetX,int offsetY,int flag1,int flag2,int flag3)
 	tileCoord[5] = tileCoordForPosition(destination + Vec2(delt, 2*delt));
 	tileCoord[6] = tileCoordForPosition(destination + Vec2(-delt, 0)); 
 	tileCoord[7] = tileCoordForPosition(destination + Vec2(delt, 0));
-	if (!collide(tileCoord[flag1]) && !collide(tileCoord[flag2]) && !collide(tileCoord[flag3]))
+	if (!collide(tileCoord[flag1],PLAYER) && !collide(tileCoord[flag2], PLAYER) && !collide(tileCoord[flag3], PLAYER))
 		_player->runAction(moveTo);
-	else
-		_player->runAction(MoveTo::create(0.06, _player->getPosition() + Vec2(-offsetX/2, -offsetY/2)));
 }
 Vec2 GameScene::centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord) {
 	Size mapSize = map->getMapSize();//TileMap坐标的行数，列数
@@ -505,8 +596,30 @@ Vec2 GameScene::centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord) {
 	return Vec2(x, y);
 }
 
-bool GameScene::collide(Vec2 position)
+bool GameScene::collide(Vec2 position,int type)
 {
+	//泡泡也是障碍物
+	for (int i = 0; i < _popVector.size(); i++) {
+		Vec2 popPosition = _popVector.at(i)->getPosition();
+		Vec2 popPositionForTileMap = tileCoordForPosition(popPosition);
+		if (position == popPositionForTileMap && type == PLAYER) {
+			return true;
+		}
+	}
+	//检测是否可炸
+	for (int i = 0; i < _breakableBlockVector.size(); i++)
+	{
+
+		Vec2 popPosition = _breakableBlockVector.at(i)->getPosition();
+		Sprite* erase = _breakableBlockVector.at(i);
+		Vec2 popPositionForTileMap = tileCoordForPosition(popPosition);
+		if (position == popPositionForTileMap)
+		{
+			if (type == POP)
+				_breakableBlockVector.eraseObject(erase);
+			return true;
+		}
+	}
 	//使用tileGid函数获取TileMap坐标系里的GID，GID是“全局唯一标示”
 	int tileGid = _collidable->getTileGIDAt(position);
 	if (tileGid)

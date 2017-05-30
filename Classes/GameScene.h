@@ -3,6 +3,11 @@
 #include "cocos2d.h"
 USING_NS_CC;
 
+enum Type
+{
+	PLAYER = 1,
+	POP = 2
+};
 class GameScene : public cocos2d::Layer
 {
 public:
@@ -22,8 +27,6 @@ public:
 	void keyPressedDuration(EventKeyboard::KeyCode code);
 	//更新位置
 	void UpdatePosition(float delta);
-	//获取player当前应有的zorder
-	int getZorder() { return tileCoordForPosition(_player->getPosition()).y; }
 	//通过动画名字得到相应的动画
 	Animate* getAnimateByName(std::string animName, float delay, int animNum);
 	/**
@@ -37,14 +40,18 @@ public:
 	//使用CREATE_FUNC宏创建当前类的对象，返回的对象将会由自动释放池管理内存的释放
 	CREATE_FUNC(GameScene);
 	///判断是否会碰到障碍物
-	bool collide(Vec2 position);
+	bool collide(Vec2 position,int type);
 private:
+
 	//键盘按键记录
 	std::map<cocos2d::EventKeyboard::KeyCode, bool> keys;
 	TMXTiledMap* map;  // 地图
 	Sprite* _player;  // 玩家精灵
 	TMXLayer* _collidable;  // 障碍层
+	TMXLayer* _boxbottom;//底层
+	Vector<TMXLayer*> _layerNames;//层名字
 	Vector<Sprite* > _popVector;//泡泡层
+	Vector<Sprite*> _breakableBlockVector;//可爆炸物数组
 	int power = 2;//泡泡威力
 	//向左、右、上、下的静态图片，当向对应方向移动时，用此贴图进行替换
 	CCTexture2D *_player_texture_left;
