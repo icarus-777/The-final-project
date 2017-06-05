@@ -24,66 +24,22 @@ bool GameScene::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	//显示地图
-	  map = TMXTiledMap::create("Map.tmx");
-	  // 把地图的锚点和位置都设置为原点，这样可以使地图的左下角与屏幕的左下角对齐
-	//设置地图的锚点
-	map->setAnchorPoint(Vec2::ZERO);
-	//设置地图位置
-	map->setPosition(0, 0);
-	map->setScale(1.5f);
+	  map = MapLayer::create();
+	  map->setScale(1.5f);
     addChild(map, 0);
 
-	// 获取障碍层，并设置障碍层不可见
-	_collidable = map->getLayer("collidable");
-	_collidable->setVisible(false);
-	_boxbottom = map->getLayer("boxbottom");
-	_layerNames.pushBack(map->getLayer("boxtop"));
 	//一个玩家
-	auto objects = map->getObjectGroup("Object");
+	auto objects = (map->getMap())->getObjectGroup("Object");
 	ValueMap mapPlayer = objects->getObject("player");
 	int x = mapPlayer.at("x").asInt();
 	int y = mapPlayer.at("y").asInt();
-	_player =Sprite::create("player_down_1.png");
+	_player =Player::create();
 	// 设置位置并添加为地图的子节点
 	_player->setPosition(x, y);
-	_player->setAnchorPoint(_player->getAnchorPoint() +Vec2(0,-0.5) );
-	map->addChild(_player,4);
-	//将四个方向的移动图片加入缓存
-	_player_texture_left = CCTextureCache::sharedTextureCache()->addImage("player_left_1.png");
-	_player_texture_right = CCTextureCache::sharedTextureCache()->addImage("player_right_1.png");
-	_player_texture_up = CCTextureCache::sharedTextureCache()->addImage("player_up_1.png");
-	_player_texture_down = CCTextureCache::sharedTextureCache()->addImage("player_down_1.png");
-	//在breakable的block上放一个精灵 这样就可以发生碰撞
-	int breakableBlocks[13][17] = {
-		//0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //0
-		{ 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0 }, //1
-		{ 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0 }, //2
-		{ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }, //3
-		{ 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 0, 0 }, //4
-		{ 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0 }, //5
-		{ 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0 }, //6
-		{ 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0 }, //7
-		{ 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0 }, //8
-		{ 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0 }, //9
-		{ 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0 }, //10
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //11 
-	};
+	_player->setAnchorPoint(_player->getAnchorPoint() + Vec2(0, -0.5));
+	map->getMap()->addChild(_player, 4);
 
-	for (int i = 0; i < 13; i++)
-	{
-		for (int j = 0; j < 17; j++)
-		{
-			if (breakableBlocks[i][j] == 1)
-			{
-				auto test = Sprite::create();
-				test->setAnchorPoint(Vec2(0.5, 0.5));
-				test->setPosition(centerPositionForTileCoord(Vec2(j, i)));
-				_breakableBlockVector.pushBack(test);
-				map->addChild(test, 5);
-			}
-		}
-	}
+	map->create_BlockVector(_breakableBlockVector);
 	// 创建键盘事件监听器
 	auto keyBoardListener = EventListenerKeyboard::create();
 	//当键被按下，map中这个键的值被设为true
@@ -91,7 +47,7 @@ bool GameScene::init()
 		keys[code] = true;
 		if (code != EventKeyboard::KeyCode::KEY_SPACE) {
 			_player->stopAllActions();
-			this->ForeverMove(code);
+			_player->ForeverMove(code);
 		}
 	};
 	//当键被松开，map中这个键的值被设为false
@@ -104,32 +60,23 @@ bool GameScene::init()
 			upArrow = EventKeyboard::KeyCode::KEY_UP_ARROW,
 			downArrow = EventKeyboard::KeyCode::KEY_DOWN_ARROW,
 			space = EventKeyboard::KeyCode::KEY_SPACE;
-
 		if (isKeyPressed(leftArrow)) {
-			this->ForeverMove(leftArrow);
+			_player->ForeverMove(leftArrow);
 		}
-		else if (isKeyPressed(rightArrow)) {
-			this->ForeverMove(rightArrow);
+		else if (isKeyPressed(rightArrow))
+		{
+			_player->ForeverMove(rightArrow);
 		}
-		else if (isKeyPressed(upArrow)) {
-			this->ForeverMove(upArrow);
+		else if (isKeyPressed(upArrow))
+		{
+			_player->ForeverMove(upArrow);
 		}
-		else if (isKeyPressed(downArrow)) {
-			this->ForeverMove(downArrow);
+		else if (isKeyPressed(downArrow))
+		{
+			_player->ForeverMove(downArrow);
 		}
 		else {
-			if ((EventKeyboard::KeyCode::KEY_LEFT_ARROW == code)) {
-				_player->setTexture(_player_texture_left);
-			}
-			else if (EventKeyboard::KeyCode::KEY_RIGHT_ARROW == code) {
-				_player->setTexture(_player_texture_right);
-			}
-			else if (EventKeyboard::KeyCode::KEY_UP_ARROW == code) {
-				_player->setTexture(_player_texture_up);
-			}
-			else if (EventKeyboard::KeyCode::KEY_DOWN_ARROW == code) {
-				_player->setTexture(_player_texture_down);
-			}
+			_player->StandMove(code);
 		}
 	};
 	// 响应键盘事件函数
@@ -215,7 +162,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 		pop->setScale(0.9f);
 		_popVector.pushBack(pop);
 		//设置泡泡的zorder
-		map->addChild(pop, 1);
+		map->getMap()->addChild(pop, 1);
 		//从泡泡被放入vector到泡泡爆炸的延时
 		DelayTime * _delayDelete = DelayTime::create(3.0f);
 		DelayTime *e = DelayTime::create(0.5f);
@@ -311,7 +258,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 					auto sprite = Sprite::create();
 					sprite->setPosition(Vec2(popx->getPositionX() + 40 * i, popx->getPositionY()));
 					rightSprite.pushBack(sprite);//将精灵放入数组
-					map->addChild(sprite, 10);
+					map->getMap()->addChild(sprite, 10);
 					if (rightWaterLength != i)//水柱中间的动画
 					{
 						auto animation = Animation::create();
@@ -345,7 +292,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 					auto sprite = Sprite::create();
 					sprite->setPosition(Vec2(popx->getPositionX() - 40 * i, popx->getPositionY()));
 					leftSprite.pushBack(sprite);//将精灵放入数组
-					map->addChild(sprite, 10);
+					map->getMap()->addChild(sprite, 10);
 					if (leftWaterLength != i)//水柱中间的动画
 					{
 						auto animation = Animation::create();
@@ -378,7 +325,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 					auto sprite = Sprite::create();
 					sprite->setPosition(Vec2(popx->getPositionX(), popx->getPositionY() + 40 * i));
 					upSprite.pushBack(sprite);//将精灵放入数组
-					map->addChild(sprite, 10);
+					map->getMap()->addChild(sprite, 10);
 					if (upWaterLength != i)//水柱中间的动画
 					{
 						auto animation = Animation::create();
@@ -411,7 +358,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 					auto sprite = Sprite::create();
 					sprite->setPosition(Vec2(popx->getPositionX(), popx->getPositionY() - 40 * i));
 					downSprite.pushBack(sprite);//将精灵放入数组
-					map->addChild(sprite, 10);
+					map->getMap()->addChild(sprite, 10);
 					if (downWaterLength != i)//水柱中间的动画
 					{
 						auto animation = Animation::create();
@@ -476,10 +423,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 			}
 			//泡泡位置
 			Vec2 popPositionForTileMap = tileCoordForPosition(popPosition);
-			Sprite* Up;//被炸物的上半部分
 
-			Sprite* emptySprite = Sprite::create();//空精灵
-			emptySprite->setPosition(Vec2(-1, -1));
 			Vec2 _BubblePosition[4];
 			//四个爆炸位置
 			if (leftWaterLength == power)
@@ -514,37 +458,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 			{
 				_BubblePosition[3] = popPositionForTileMap + Vec2(0, downWaterLength + 1);
 			}
-			int _GID[4];//GID
-			Vector<Sprite*> _erasePopvector;//临时被摧毁建筑数组
-			for (int i = 0; i < 4; i++)
-			{
-				//四个方向的爆炸，没有建筑就加一个空的精灵
-				if (_boxbottom->getTileAt(_BubblePosition[i]) != nullptr)
-				{
-					_erasePopvector.pushBack(_boxbottom->getTileAt(_BubblePosition[i]));
-				}
-				else
-				{
-					_erasePopvector.pushBack(emptySprite);
-				}
-
-				_GID[i] = _boxbottom->getTileGIDAt(_BubblePosition[i]);
-                //建筑要被设置为不可见
-				if (_GID[i])
-				{
-					_erasePopvector.at(i)->setVisible(false);//下半部分
-					Value properties = map->getPropertiesForGID(_GID[i]);
-					ValueMap valuemap = properties.asValueMap();
-					std::string value = valuemap.at("breakable").asString();
-					if (value == "true")
-					{
-						Up = _layerNames.at(0)->getTileAt(_BubblePosition[i] + Vec2(0, -1));//上半部分
-						Up->setVisible(false);
-					}
-				}
-			}
-			_erasePopvector.clear();
-
+			map->boom(_BubblePosition);
 		});
 		auto callFunc3 = CallFunc::create([=] {
 			//泡泡爆炸时，获取地图上现存的第一个被放置的泡泡并删除它
@@ -584,16 +498,22 @@ void GameScene::rightMove(int Move,int flag1,int flag2,int flag3)
 	else
 		on_pop = true;
 	Vec2 tileCoord[8];//0 下,1 上, 2 左, 3 右 ,4 左上, 5 右上, 6 左下, 7 右下
-	tileCoord[0] = tileCoordForPosition(destination );
+	tileCoord[0] = tileCoordForPosition(destination + Vec2(0, -3));
 	tileCoord[1] = tileCoordForPosition(destination + Vec2(0, 2*delt));
 	tileCoord[2] = tileCoordForPosition(destination + Vec2(-delt, delt));
 	tileCoord[3] = tileCoordForPosition(destination + Vec2(delt, delt));
 	tileCoord[4] = tileCoordForPosition(destination + Vec2(-delt, 2*delt));
 	tileCoord[5] = tileCoordForPosition(destination + Vec2(delt, 2*delt));
-	tileCoord[6] = tileCoordForPosition(destination + Vec2(-delt, 0)); 
-	tileCoord[7] = tileCoordForPosition(destination + Vec2(delt, 0));
-	if (!collide(tileCoord[flag1],PLAYER) && !collide(tileCoord[flag2], PLAYER) && !collide(tileCoord[flag3], PLAYER))
+	tileCoord[6] = tileCoordForPosition(destination + Vec2(-delt, -3)); 
+	tileCoord[7] = tileCoordForPosition(destination + Vec2(delt, -3));
+	if (!collide(tileCoord[flag1], PLAYER) && !collide(tileCoord[flag2], PLAYER) && !collide(tileCoord[flag3], PLAYER))
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			moveRecord[i] = false;
+		}
 		_player->runAction(moveTo);
+	}
 	else
 	{
 		if (!moveRecord[Move])
@@ -610,8 +530,8 @@ void GameScene::rightMove(int Move,int flag1,int flag2,int flag3)
 	}
 }
 Vec2 GameScene::centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord) {
-	Size mapSize = map->getMapSize();//TileMap坐标的行数，列数
-	Size tileSize = map->getTileSize();//图块大小
+	Size mapSize = (map->getMap())->getMapSize();//TileMap坐标的行数，列数
+	Size tileSize = (map->getMap())->getTileSize();//图块大小
 	int x = TileCoord.x * tileSize.width + tileSize.width / 2;
 	int y = (mapSize.height - TileCoord.y)*tileSize.height - tileSize.height / 2;
 	return Vec2(x, y);
@@ -647,65 +567,11 @@ bool GameScene::collide(Vec2 position,int type)
 		}
 	}
 	//使用tileGid函数获取TileMap坐标系里的GID，GID是“全局唯一标示”
-	int tileGid = _collidable->getTileGIDAt(position);
-	if (tileGid)
-	{
-		Value properties = map->getPropertiesForGID(tileGid);
-		ValueMap valueMap = properties.asValueMap();
-		//查找ValueMap，如果有可碰撞物体，直接返回
-		std::string value = valueMap.at("collidable").asString();
-		if (value.compare("true") == 0)
-		{
-			return 1;
-		}
-	}
+	if (map->judge_collide(position))
+		return 1;
 	return 0;
 }
-void GameScene::ForeverMove(EventKeyboard::KeyCode code) {
 
-	Animate* animate;
-	std::string Name = "player";
-
-	switch (code) {
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		animate = getAnimateByName(Name + "_left_", 0.1f, 6);
-		break;
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		animate = getAnimateByName(Name + "_right_", 0.1f, 6);
-		break;
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		animate = getAnimateByName(Name + "_up_", 0.05f, 6);
-		break;
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		animate = getAnimateByName(Name + "_down_", 0.1f, 6);
-		break;
-	}
-	//创建一个动作 重复执行动画
-	auto repeatAnimate = RepeatForever::create(animate);
-	_player->runAction(repeatAnimate);
-}
-//通过动画名字得到相应的动画
-Animate * GameScene::getAnimateByName(std::string animName, float delay, int animNum)
-{
-	// 创建一个动画
-	Animation* animation = Animation::create();
-	// 循环从精灵帧缓存中获取与图片名称相对应的精灵帧组成动画
-	for (unsigned int i = 1; i <= animNum; i++) {
-		std::string frameName = animName;
-
-		//在动画帧名称后加上序号
-		frameName.append(StringUtils::format("%d", i)).append(".png");
-		animation->addSpriteFrameWithFile(frameName.c_str());
-	}
-	//设置动画延时
-	animation->setDelayPerUnit(delay);
-
-	//在播放完动画时恢复到初始帧
-	animation->setRestoreOriginalFrame(true);
-	Animate* animate = Animate::create(animation);
-
-	return animate;
-}
 
 // 将屏幕坐标转换为TileMap坐标，暂时没用
 Vec2 GameScene::tileCoordForPosition(Vec2 position)
@@ -713,11 +579,11 @@ Vec2 GameScene::tileCoordForPosition(Vec2 position)
  // 玩家位置的x除以地图的宽，得到的是地图横向的第几个格子（tile）
  // 地图宽计算：26[格子] * 64[图块的宽] = 1680[地图宽]
  // 假如精灵在的x坐标是640，则精灵所在地图的格子计算：640[精灵位置] / 64[图块的宽] = 10 [格子]
-	int x = (int)(position.x / (map->getTileSize().width / CC_CONTENT_SCALE_FACTOR()));
+	int x = (int)(position.x / ((map->getMap())->getTileSize().width / CC_CONTENT_SCALE_FACTOR()));
 	// 玩家位置的y除以地图的高，得到的是地图纵向第几个格子（tile），
 	// 但是因为cocos2d-x的y轴（左下角）和TileMap的y轴（左上角）轴相反，所以使用地图的高度减去玩家位置的y
-	float pointHeight = map->getTileSize().height / CC_CONTENT_SCALE_FACTOR();
-	int y = (int)((map->getMapSize().height * pointHeight - position.y) / pointHeight);
+	float pointHeight = (map->getMap())->getTileSize().height / CC_CONTENT_SCALE_FACTOR();
+	int y = (int)(((map->getMap())->getMapSize().height * pointHeight - position.y) / pointHeight);
 	return Vec2(x,y);
 }
 
