@@ -40,116 +40,42 @@ bool GameScene::init()
 
 	map->create_BlockVector(_breakableBlockVector, _giftVector);
 	// 创建键盘事件监听器
-	auto keyBoardListener = EventListenerKeyboard::create();
-	//当键被按下，map中这个键的值被设为true
-	keyBoardListener->onKeyPressed = [=](EventKeyboard::KeyCode code, Event* event) {
-		keys[code] = true;
-		if (code != EventKeyboard::KeyCode::KEY_SPACE) {
-			_player->stopAllActions();
-			_player->ForeverMove(code);
-		}
-	};
-	//当键被松开，map中这个键的值被设为false
-	keyBoardListener->onKeyReleased = [=](EventKeyboard::KeyCode code, Event* event) {
-		keys[code] = false;
-		_player->stopAllActions();
-		auto
-			leftArrow = EventKeyboard::KeyCode::KEY_LEFT_ARROW,
-			rightArrow = EventKeyboard::KeyCode::KEY_RIGHT_ARROW,
-			upArrow = EventKeyboard::KeyCode::KEY_UP_ARROW,
-			downArrow = EventKeyboard::KeyCode::KEY_DOWN_ARROW,
-			space = EventKeyboard::KeyCode::KEY_SPACE;
-		if (isKeyPressed(leftArrow)) {
-			_player->ForeverMove(leftArrow);
-		}
-		else if (isKeyPressed(rightArrow))
-		{
-			_player->ForeverMove(rightArrow);
-		}
-		else if (isKeyPressed(upArrow))
-		{
-			_player->ForeverMove(upArrow);
-		}
-		else if (isKeyPressed(downArrow))
-		{
-			_player->ForeverMove(downArrow);
-		}
-		else {
-			_player->StandMove(code);
-		}
-	};
-	// 响应键盘事件函数
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(keyBoardListener, this);
+	key = KeyBoard::create();
+	key->startKB();
+	this->addChild(key);
+
 	// 游戏主循环,每帧都调用的函数
 	this->scheduleUpdate();
 	return true;
 }
 
-
-
-//判断键盘是否按住
-bool GameScene::isKeyPressed(EventKeyboard::KeyCode code) {
-	return keys[code];
-}
-//更新玩家位置
-void GameScene::UpdatePosition(float delta) {
-	//四个方向键
-	auto leftArrow = EventKeyboard::KeyCode::KEY_LEFT_ARROW,
-		rightArrow = EventKeyboard::KeyCode::KEY_RIGHT_ARROW,
-		upArrow = EventKeyboard::KeyCode::KEY_UP_ARROW,
-		downArrow = EventKeyboard::KeyCode::KEY_DOWN_ARROW,
-	space = EventKeyboard::KeyCode::KEY_SPACE;
-
-	int arrow = isKeyPressed(leftArrow) + isKeyPressed(rightArrow) + isKeyPressed(upArrow) + isKeyPressed(downArrow);
-
-	//同时按下方向键和空格键，也可放下一个水泡
-	if ((isKeyPressed(space) && arrow)||(isKeyPressed(space))) {
-		keyPressedDuration(space);
-		keys[space] = false;
-	}
-
-	//按下方向键，玩家移动
-	if (isKeyPressed(leftArrow)) {
-		keyPressedDuration(leftArrow);
-	}
-	else if (isKeyPressed(rightArrow)) {
-		keyPressedDuration(rightArrow);
-	}
-	else if (isKeyPressed(upArrow)) {
-		keyPressedDuration(upArrow);
-	}
-	else if (isKeyPressed(downArrow)) {
-		keyPressedDuration(downArrow);
-	}
-}
-
-
 //每帧调用这个函数，更新画面
 void GameScene::update(float delta) {
 	//更新玩家位置
-	UpdatePosition(delta);
+	keyPressedDuration(delta);
 	//判断是否碰到道具
 	giftcollide(delta);
 }
 
-
 //键盘按下后的事情
-void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
+void GameScene::keyPressedDuration(float delta) {
 	int Move=4;
-	switch (code) {
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		Move=0;
-		break;
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		Move = 1;
-		break;
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		Move = 2;
-		break;
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		Move = 3;
-		break;
-	case EventKeyboard::KeyCode::KEY_SPACE:
+	if (key->keyBoardDirection < 4&& key->keyBoardDirection>=0)
+	{
+		if (key->keyBoardDirection != record)
+		{
+			_player->ForeverMove(key->keyBoardDirection);
+			record = key->keyBoardDirection;
+		}
+		Move = key->keyBoardDirection;
+	}
+	else if (key->keyBoardDirection == 4)
+	{
+		_player->StandMove(record);
+		record = -1;
+	}
+	else if(key->keyBoardDirection ==keyBoard_space)
+	{
 		if (_popVector.size() < popMax)
 		{
 			//玩家位置
@@ -473,8 +399,7 @@ void GameScene::keyPressedDuration(EventKeyboard::KeyCode code) {
 			auto action = Sequence::create(callFunc1, _delayDelete, callFunc2, e, callFunc3, NULL);
 			pop->runAction(action);
 		}
-		
-		break;
+		key->keyBoardDirection = keyBoard_stand;
 	}
 	//开始判断是否撞墙
 	if (Move != 4)

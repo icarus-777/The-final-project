@@ -11,22 +11,22 @@ bool Player::init()
 	this->addChild(_player);
 	return true;
 }
-void Player::ForeverMove(EventKeyboard::KeyCode code) {
+void Player::ForeverMove(int code) {
 
 	Animate* animate;
 	std::string Name = "player";
 	_player->stopAllActions();
 	switch (code) {
-	case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
+	case keyBoard_left:
 		animate = getAnimateByName(Name + "_left_", 0.1f, 6);
 		break;
-	case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
+	case keyBoard_right:
 		animate = getAnimateByName(Name + "_right_", 0.1f, 6);
 		break;
-	case EventKeyboard::KeyCode::KEY_UP_ARROW:
+	case keyBoard_up:
 		animate = getAnimateByName(Name + "_up_", 0.05f, 6);
 		break;
-	case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
+	case keyBoard_down:
 		animate = getAnimateByName(Name + "_down_", 0.1f, 6);
 		break;
 	}
@@ -34,19 +34,19 @@ void Player::ForeverMove(EventKeyboard::KeyCode code) {
 	auto repeatAnimate = RepeatForever::create(animate);
 	_player->runAction(repeatAnimate);
 }
-void Player::StandMove(EventKeyboard::KeyCode code)
+void Player::StandMove(int code)
 {
 	_player->stopAllActions();
-	if ((EventKeyboard::KeyCode::KEY_LEFT_ARROW == code)) {
+	if (keyBoard_left == code) {
 		_player->setTexture(_player_texture_left);
 	}
-	else if (EventKeyboard::KeyCode::KEY_RIGHT_ARROW == code) {
+	else if (keyBoard_right == code) {
 		_player->setTexture(_player_texture_right);
 	}
-	else if (EventKeyboard::KeyCode::KEY_UP_ARROW == code) {
+	else if (keyBoard_up == code) {
 		_player->setTexture(_player_texture_up);
 	}
-	else if (EventKeyboard::KeyCode::KEY_DOWN_ARROW == code) {
+	else if (keyBoard_down == code) {
 		_player->setTexture(_player_texture_down);
 	}
 }

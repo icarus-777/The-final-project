@@ -7,7 +7,7 @@
 #define _PLAYER_
 
 #include "cocos2d.h"
-
+#include"KeyBoard.h"
 USING_NS_CC;
 
 class Player :public Layer
@@ -16,8 +16,8 @@ public:
 	virtual bool init();
 	//精灵永远执行这个动作
 	CC_SYNTHESIZE(Sprite*, player, Player);
-	void ForeverMove(EventKeyboard::KeyCode code);
-	void StandMove(EventKeyboard::KeyCode code);
+	void ForeverMove(int code);
+	void StandMove(int code);
 
 	//通过动画名字得到相应的动画
 	Animate* getAnimateByName(std::string animName, float delay, int animNum);
