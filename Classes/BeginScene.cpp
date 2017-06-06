@@ -63,6 +63,7 @@ bool BeginScene::init()
 	Set->setPosition(850, size.height / 2 - 250);
 	Set->setScale(0.9f);
 	addChild(Set);
+	SimpleAudioEngine::getInstance()->playBackgroundMusic("Village.mp3", true);
 	return true;
 }
 
