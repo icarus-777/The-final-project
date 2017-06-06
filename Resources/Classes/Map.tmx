@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="16" height="12" tilewidth="40" tileheight="40" nextobjectid="2">
+ <tileset firstgid="1" name="map" tilewidth="40" tileheight="40" tilecount="625" columns="25">
+  <image source="map.png" width="1024" height="1024"/>
+  <tile id="36">
+   <properties>
+    <property name="collidable" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="road" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJy9jkEKACEMA4vi4is0/3+lCj24QbPrxcNQaJ2YZGboJKd2ApF9Rto/PjHtlM/c9FcZsw/hc4fxpjjB3h3++nzHxrvpQ+RkYvfPKkflKr46nWYw494AwHgGbQ==
+  </data>
+ </layer>
+ <layer name="row_2" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYMANOLGIceNRjw6UsIipkKB/FIwCWgMA8fwAWw==
+  </data>
+ </layer>
+ <layer name="row_3" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAMcGERY8QjDqNhbGUs6qTwiMNoKSzyo2AUkAoA4bMAxw==
+  </data>
+ </layer>
+ <layer name="row_4" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBg8gBuNz0iifhU0vhQFbhkFIwMAAKdYAEs=
+  </data>
+ </layer>
+ <layer name="row_5" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBg5gAuKyQXKUDwKhg8AAKvUAFs=
+  </data>
+ </layer>
+ <layer name="row_6" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgF2AAjhfqlqOKKUUBrAAAv+AAc
+  </data>
+ </layer>
+ <layer name="row_7" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFlABOAvJcaGrQ1SsR0K+MpoaQ+lFAGgAA/YQArw==
+  </data>
+ </layer>
+ <layer name="row_8" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFAw0YiRTDpUYKixw2MXLUDHcAAF+4AFI=
+  </data>
+ </layer>
+ <layer name="row_9" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFwwUwYhHjJkG/FBYxFTLdMlQAAEjcAEs=
+  </data>
+ </layer>
+ <layer name="row_10" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2DkAgADAAAB
+  </data>
+ </layer>
+ <layer name="row_11" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo4AywEWiem4g5gRiRihfmUT9KkCsBMRSJOrDBgBBxACj
+  </data>
+ </layer>
+ <layer name="row_12" width="16" height="12">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2DgACMSzYhPIQ4ghURL4VOIAwAAFeQAUg==
+  </data>
+ </layer>
+ <objectgroup name="Object">
+  <object id="1" name="player" x="40" y="120" width="40" height="40"/>
+ </objectgroup>
+ <layer name="collidable" width="16" height="12">
+  <properties>
+   <property name="collidable" type="bool" value="true"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJxjYKAdUCVCDJcafHoJyeMzmxKAy15caqmhDt1OYvxNrP3ExgWtAal2qKJhBgbS4gYZAAAQJgQy
+  </data>
+ </layer>
+</map>
