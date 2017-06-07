@@ -5,10 +5,11 @@
 #include"MapLayer.h"
 #include "SpriteGift.h"
 #include"KeyBoard.h"
-<<<<<<< HEAD
+#include"MenuSwitch.h"
+//<<<<<<< HEAD
 #include "AudioControlScene.h"
-=======
->>>>>>> origin/master
+//=======
+//>>>>>> origin/master
 USING_NS_CC;
 class GameScene : public cocos2d::Layer
 {

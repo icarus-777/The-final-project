@@ -1,6 +1,5 @@
 #include "AudioControlScene.h"
-#include "ui/CocosGUI.h"
-#include "MenuSwitch.h"
+
 USING_NS_CC;
 using namespace ui;
 
@@ -111,7 +110,7 @@ bool AudioControl::init() {
 	auto* pSet = MenuItemImage::create("button4.1.png",
 		"button4.2.png",
 		this,
-		menu_selector(MenuSwitch::BackToMenu));
+		menu_selector(MenuSwitch::BackToLast));
 	auto* Set = Menu::create(pSet, NULL);
 	Set->setAnchorPoint(Vec2(0, 0));
 	Set->setPosition(850, visibleSize.height / 2 - 250);

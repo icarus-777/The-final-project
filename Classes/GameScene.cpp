@@ -27,6 +27,17 @@ bool GameScene::init()
 	  map->setScale(1.5f);
     addChild(map, 0);
 
+	//暂停按钮
+	auto* pBreak = MenuItemImage::create("pause 1.png",
+		"pause 2.png",
+		this,
+		menu_selector(MenuSwitch::Break));
+	auto* Break = Menu::create(pBreak, NULL);
+	Break->setAnchorPoint(Vec2(0, 1.2));
+	Break->setPosition(visibleSize.width, 0);
+	Break->setScale(0.9f);
+	addChild(Break);
+
 	//一个玩家
 	auto objects = (map->getMap())->getObjectGroup("Object");
 	ValueMap mapPlayer = objects->getObject("player");

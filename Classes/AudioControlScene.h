@@ -5,6 +5,8 @@
 #include "cocos2d.h"
 #include "SimpleAudioEngine.h"
 #include "BeginScene.h"
+#include "ui/CocosGUI.h"
+#include "MenuSwitch.h"
 using namespace CocosDenshion;
 
 // AudioControl类用来设置背景音乐和声音特效
