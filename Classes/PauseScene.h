@@ -15,4 +15,8 @@ public:
 };
 
 #endif 
+<<<<<<< HEAD
 
+=======
+
+>>>>>>> origin/master

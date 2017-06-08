@@ -38,7 +38,11 @@ bool PauseScene::init()
 		menu_selector(MenuSwitch::StartGame));
 	auto* Start = Menu::create(pStart, NULL);
 	Start->setAnchorPoint(Vec2(0, 0));
+<<<<<<< HEAD
 	Start->setPosition(850, size.height / 2 - 70);
+=======
+	Start->setPosition(850, size.height / 5);
+>>>>>>> origin/master
 	Start->setScale(0.9f);
 	addChild(Start);
 	//结束游戏按钮
@@ -48,7 +52,11 @@ bool PauseScene::init()
 		menu_selector(MenuSwitch::ExitGame));
 	auto* Exit = Menu::create(pExit, NULL);
 	Exit->setAnchorPoint(Vec2(0, 0));
+<<<<<<< HEAD
 	Exit->setPosition(850, size.height / 2 - 160);
+=======
+	Exit->setPosition(850, size.height * 2 / 5);
+>>>>>>> origin/master
 	Exit->setScale(0.9f);
 	addChild(Exit);
 
@@ -59,18 +67,31 @@ bool PauseScene::init()
 		menu_selector(MenuSwitch::GameSet));
 	auto* Set = Menu::create(pSet, NULL);
 	Set->setAnchorPoint(Vec2(0, 0));
+<<<<<<< HEAD
 	Set->setPosition(850, size.height / 2 - 250);
+=======
+	Set->setPosition(850, size.height * 3 / 5);
+>>>>>>> origin/master
 	Set->setScale(0.9f);
 	addChild(Set);
 
 	//继续游戏
+<<<<<<< HEAD
 	auto* pGoOn = MenuItemImage::create("goon 1.png",
 		"goon 2.png",
+=======
+	auto* pGoOn = MenuItemImage::create("继续.png",
+		"继续.png",
+>>>>>>> origin/master
 		this,
 		menu_selector(MenuSwitch::Continue));
 	auto* GoOn = Menu::create(pGoOn, NULL);
 	GoOn->setAnchorPoint(Vec2(0, 0));
+<<<<<<< HEAD
 	GoOn->setPosition(850, size.height / 2 + 20);
+=======
+	GoOn->setPosition(850, size.height * 4 / 5);
+>>>>>>> origin/master
 	GoOn->setScale(0.9f);
 	addChild(GoOn);
 	SimpleAudioEngine::getInstance()->playBackgroundMusic("Village.mp3", true);

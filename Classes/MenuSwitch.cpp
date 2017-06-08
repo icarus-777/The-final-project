@@ -21,17 +21,29 @@ void MenuSwitch::BackToLast(cocos2d::Ref* pSender)
 void MenuSwitch::GameSet(cocos2d::Ref* pSender)
 {
 	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
+<<<<<<< HEAD
 	auto transition = TransitionFadeTR::create(0.5, AudioControl::createScene());///创建场景转换
 	Director::getInstance()->pushScene(transition);
 }
 void MenuSwitch::Continue(cocos2d::Ref* pSender)
 {
+=======
+	auto transition = TransitionSlideInL::create(0.5, AudioControl::createScene());///创建场景转换
+	Director::getInstance()->pushScene(transition);
+}
+void MenuSwitch::Continue(cocos2d::Ref* pSender)
+{
+>>>>>>> origin/master
 	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
 	Director::getInstance()->popScene();
 }
 void MenuSwitch::Break(cocos2d::Ref* pSender)
 {
 	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
+<<<<<<< HEAD
 	auto transition = TransitionProgressInOut::create(0.5,PauseScene::createScene());///创建场景转换
+=======
+	auto transition = TransitionSlideInL::create(0.5,PauseScene::createScene());///创建场景转换
+>>>>>>> origin/master
 	Director::getInstance()->pushScene(transition);
 }

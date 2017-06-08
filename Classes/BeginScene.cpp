@@ -1,8 +1,8 @@
 #include "BeginScene.h"
-#include "GameScene.h"
-#include "MenuSwitch.h"
-USING_NS_CC;
 
+//#include"SimpleAudioEngine.h";
+USING_NS_CC;
+//using namespace CocosDenshion;
 Scene* BeginScene::createScene()
 {    
 	// 创建一个场景对象
