@@ -1,5 +1,6 @@
 #include "AudioControlScene.h"
-
+#include "ui/CocosGUI.h"
+#include "MenuSwitch.h"
 USING_NS_CC;
 using namespace ui;
 

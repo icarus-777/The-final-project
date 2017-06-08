@@ -2,8 +2,6 @@
 #define __BEGIN_SCENE_H__
 
 #include "cocos2d.h"
-#include "GameScene.h"
-#include "MenuSwitch.h"
 
 class BeginScene : public cocos2d::Layer
 {
