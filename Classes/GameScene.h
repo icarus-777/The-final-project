@@ -5,10 +5,10 @@
 #include"MapLayer.h"
 #include "SpriteGift.h"
 #include"KeyBoard.h"
-<<<<<<< HEAD
 #include "AudioControlScene.h"
-=======
->>>>>>> origin/master
+#include "MenuSwitch.h"
+#include "pop.h"
+
 USING_NS_CC;
 class GameScene : public cocos2d::Layer
 {
@@ -17,10 +17,6 @@ public:
 	static cocos2d::Scene* createScene();
 	//init函数，完成初始化操作
 	virtual bool init();
-	// 将屏幕坐标转换为TileMap坐标
-	Vec2 tileCoordForPosition(Vec2 position);
-	//求方格的中心坐标  
-	Vec2 centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord);
 	//键盘按下后的事情
 	void keyPressedDuration(float delta);
 	/**
@@ -43,7 +39,7 @@ private:
 	KeyBoard *key;
 	MapLayer * map;  // 地图
 	Player* _player;  // 玩家精灵
-	Vector<Sprite* > _popVector;//泡泡层
+	Vector<Pop*> _popVector;//泡泡层
 	Vector<Sprite*> _breakableBlockVector;//可爆炸物数组
 	Vector<SpriteGift*> _giftVector;//道具数组
 	int power = 1;//泡泡威力

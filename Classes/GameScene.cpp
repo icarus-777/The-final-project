@@ -1,4 +1,5 @@
 #include "GameScene.h"
+
 USING_NS_CC;
 Scene* GameScene::createScene()
 {
@@ -26,7 +27,16 @@ bool GameScene::init()
 	  map = MapLayer::create();
 	  map->setScale(1.5f);
     addChild(map, 0);
-
+	//暂停按钮
+	auto* pBreak = MenuItemImage::create("pause 1.png",
+		"pause 2.png",
+		this,
+		menu_selector(MenuSwitch::Break));
+	auto* Break = Menu::create(pBreak, NULL);
+	Break->setAnchorPoint(Vec2(0, 0));
+	Break->setPosition(850, 40);
+	Break->setScale(0.9f);
+	addChild(Break);
 	//一个玩家
 	auto objects = (map->getMap())->getObjectGroup("Object");
 	ValueMap mapPlayer = objects->getObject("player");
@@ -81,11 +91,8 @@ void GameScene::keyPressedDuration(float delta) {
 			//玩家位置
 			Vec2 _tilePlayer = tileCoordForPosition(_player->getPosition());
 			Vec2 _popPosition = centerPositionForTileCoord(_tilePlayer);
-
-			SpriteFrameCache::getInstance()->addSpriteFramesWithFile("popo.plist");
-
 			//放置一个泡泡在格子的中心
-			Sprite* pop = Sprite::createWithSpriteFrameName("pop_1.png");
+			Pop* pop = Pop::create("pop_1.png");
 			pop->setAnchorPoint(Vec2(0.5, 0.5));
 			pop->setPosition(_popPosition);
 			pop->setScale(0.9f);
@@ -96,299 +103,15 @@ void GameScene::keyPressedDuration(float delta) {
 			DelayTime * _delayDelete = DelayTime::create(3.0f);
 			DelayTime *e = DelayTime::create(0.5f);
 			auto callFunc1 = CallFunc::create([=] {
-
-				// ②使用精灵帧缓存中的精灵创建一个动画，并设置属性
-				auto animation = Animation::create();
-				// 循环从精灵帧缓存中获取与图片名称相对应的精灵帧组成动画
-				for (int i = 1; i <= 3; i++) {
-					std::string szName = StringUtils::format("pop_%d.png", i);
-					// 将单张图片添加为精灵帧（即动画帧）
-					animation->addSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(szName));
-				}
-				// 设置动画播放的属性，3秒/15帧
-				animation->setDelayPerUnit(1.0f / 3.0f);
-				// 让精灵对象在动画执行完后恢复到最初状态
-				animation->setRestoreOriginalFrame(false);
-				animation->setLoops(-1);//表示循环播放
-				auto animate = Animate::create(animation);
-				pop->runAction(animate);
+				pop->runAction(pop->centerBoom1());
 			});
 			auto callFunc2 = CallFunc::create([=] {
-				// ②使用精灵帧缓存中的精灵创建一个动画，并设置属性
-				auto animation = Animation::create();
-				// 循环从精灵帧缓存中获取与图片名称相对应的精灵帧组成动画
-				for (int i = 4; i <= 7; i++) {
-					std::string szName = StringUtils::format("pop_%d.png", i);
-					// 将单张图片添加为精灵帧（即动画帧）
-					animation->addSpriteFrame(SpriteFrameCache::getInstance()->getSpriteFrameByName(szName));
-				}
-				// 设置动画播放的属性，3秒/15帧
-				animation->setDelayPerUnit(1.0f / 12.0f);
-				// 让精灵对象在动画执行完后恢复到最初状态
-				animation->setRestoreOriginalFrame(false);
-				animation->setLoops(1);//表示循环播放
-				auto animate = Animate::create(animation);
-				auto hide = Hide::create();//放完之后隐藏
-				auto action = Sequence::create(animate, hide, NULL);
 				auto popx = _popVector.at(0);//获得第一个泡泡
 				Vec2 popPosition = popx->getPosition();
-				popx->runAction(action);
-				//临时动作数组
-				Vector<Action*> leftAction;
-				Vector<Action*> rightAction;
-				Vector<Action*>	upAction;
-				Vector<Action*> downAction;
-				//临时精灵数组
-				Vector<Sprite*> leftSprite;
-				Vector<Sprite*> rightSprite;
-				Vector<Sprite*> upSprite;
-				Vector<Sprite*> downSprite;
-				//水柱长度
-				int leftWaterLength = power,
-					rightWaterLength = power,
-					upWaterLength = power,
-					downWaterLength = power;
-
-				//判断水柱长度是多少
-				for (int i = 0; i < leftWaterLength; i++)
-				{
-					if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x - i - 1, tileCoordForPosition(popx->getPosition()).y), POP))//缺一个函数
-					{
-						leftWaterLength = i;
-						break;
-					}
-				}
-
-				for (int i = 0; i < rightWaterLength; i++)
-					if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x + i +1, tileCoordForPosition(popx->getPosition()).y), POP))
-					{
-						rightWaterLength = i;
-						break;
-					}
-
-				for (int i = 0; i < upWaterLength; i++)
-					if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x, tileCoordForPosition(popx->getPosition()).y - i - 1), POP))
-					{
-						upWaterLength = i;
-						break;
-					}
-
-				for (int i = 0; i < downWaterLength; i++)
-					if (collide(Vec2(tileCoordForPosition(popx->getPosition()).x, tileCoordForPosition(popx->getPosition()).y + i + 1), POP))
-					{
-						downWaterLength = i;
-						break;
-					}
-				//水柱动画效果
-				if (rightWaterLength != 0)
-				{
-					for (int i = 1; i <= rightWaterLength; i++)
-					{
-						auto sprite = Sprite::create();
-						sprite->setPosition(Vec2(popx->getPositionX() + 40 * i, popx->getPositionY()));
-						rightSprite.pushBack(sprite);//将精灵放入数组
-						map->getMap()->addChild(sprite, 10);
-						if (rightWaterLength != i)//水柱中间的动画
-						{
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; ++j)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_right_%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							rightAction.pushBack(action);
-						}
-						else {//水柱尾部的动画
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_right_0%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							rightAction.pushBack(action);
-						}
-					}
-				}
-
-				if (leftWaterLength != 0)
-				{
-					for (int i = 1; i <= leftWaterLength; i++)
-					{
-						auto sprite = Sprite::create();
-						sprite->setPosition(Vec2(popx->getPositionX() - 40 * i, popx->getPositionY()));
-						leftSprite.pushBack(sprite);//将精灵放入数组
-						map->getMap()->addChild(sprite, 10);
-						if (leftWaterLength != i)//水柱中间的动画
-						{
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_left_%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							leftAction.pushBack(action);
-						}
-						else {//水柱尾部的动画
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_left_0%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							leftAction.pushBack(action);
-						}
-					}
-				}
-				if (upWaterLength != 0)
-				{
-					for (int i = 1; i <= upWaterLength; i++)
-					{
-						auto sprite = Sprite::create();
-						sprite->setPosition(Vec2(popx->getPositionX(), popx->getPositionY() + 40 * i));
-						upSprite.pushBack(sprite);//将精灵放入数组
-						map->getMap()->addChild(sprite, 10);
-						if (upWaterLength != i)//水柱中间的动画
-						{
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_up_%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							upAction.pushBack(action);
-						}
-						else {//水柱尾部的动画
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_up_0%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							upAction.pushBack(action);
-						}
-					}
-				}
-				if (downWaterLength != 0)
-				{
-					for (int i = 1; i <= downWaterLength; i++)
-					{
-						auto sprite = Sprite::create();
-						sprite->setPosition(Vec2(popx->getPositionX(), popx->getPositionY() - 40 * i));
-						downSprite.pushBack(sprite);//将精灵放入数组
-						map->getMap()->addChild(sprite, 10);
-						if (downWaterLength != i)//水柱中间的动画
-						{
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_down_%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							downAction.pushBack(action);
-						}
-						else {//水柱尾部的动画
-							auto animation = Animation::create();
-							for (int j = 1; j <= 4; j++)
-								animation->addSpriteFrameWithFileName(StringUtils::format("Explosion_down_0%d.png", j));
-							animation->setDelayPerUnit(0.1f);
-							auto animate = Animate::create(animation);
-							auto hide = Hide::create();
-							auto delay = DelayTime::create(0.f);
-							auto action = Sequence::create(delay, animate, hide, NULL);
-							downAction.pushBack(action);
-						}
-					}
-				}
-
-				//执行所有动画并从数组中删除
-				while (rightWaterLength != 0 && rightSprite.size()>0)
-				{
-					auto sprite = rightSprite.at(0);
-					auto action = rightAction.at(0);
-					sprite->runAction(action);
-					rightSprite.eraseObject(sprite);
-					rightAction.eraseObject(action);
-				}
-
-				while (leftWaterLength != 0 && leftSprite.size()>0)
-				{
-					auto sprite = leftSprite.at(0);
-					auto action = leftAction.at(0);
-					sprite->runAction(action);
-					leftSprite.eraseObject(sprite);
-						leftAction.eraseObject(action);
-				}
-
-				while (upWaterLength != 0 && upSprite.size()>0)
-				{
-					auto sprite = upSprite.at(0);
-					auto action = upAction.at(0);
-					sprite->runAction(action);
-					upSprite.eraseObject(sprite);
-					upAction.eraseObject(action);
-				}
-
-				while (downWaterLength != 0 && downSprite.size()>0)
-				{
-					auto sprite = downSprite.at(0);
-					auto action = downAction.at(0);
-					sprite->runAction(action);
-					downSprite.eraseObject(sprite);
-					downAction.eraseObject(action);
-				}
+				popx->runAction(pop->centerBoom2());
+				popx->destroy(power,popx, _breakableBlockVector,map);
 				SimpleAudioEngine::getInstance()->playEffect("explode.wav");
-				//泡泡位置
-				Vec2 popPositionForTileMap = tileCoordForPosition(popPosition);
-
-				Vec2 _BubblePosition[4];
-				//四个爆炸位置
-				if (leftWaterLength == power)
-				{
-					_BubblePosition[0] = popPositionForTileMap - Vec2(leftWaterLength, 0);
-				}
-				else
-				{
-					_BubblePosition[0] = popPositionForTileMap - Vec2(leftWaterLength + 1, 0);
-				}
-				if (rightWaterLength == power)
-				{
-					_BubblePosition[1] = popPositionForTileMap + Vec2(rightWaterLength, 0);
-				}
-				else
-				{
-					_BubblePosition[1] = popPositionForTileMap + Vec2(rightWaterLength + 1, 0);
-				}
-				if (upWaterLength == power)
-				{
-					_BubblePosition[2] = popPositionForTileMap - Vec2(0, upWaterLength);
-				}
-				else
-				{
-					_BubblePosition[2] = popPositionForTileMap - Vec2(0, upWaterLength + 1);
-				}
-				if (downWaterLength == power)
-				{
-					_BubblePosition[3] = popPositionForTileMap + Vec2(0, downWaterLength);
-				}
-				else
-				{
-					_BubblePosition[3] = popPositionForTileMap + Vec2(0, downWaterLength + 1);
-				}
-				map->boom(_BubblePosition);
+				map->boom(popx->setBubblePosition(power, popPosition));
 			});
 			auto callFunc3 = CallFunc::create([=] {
 				//泡泡爆炸时，获取地图上现存的第一个被放置的泡泡并删除它
@@ -464,13 +187,6 @@ void GameScene::rightMove(int Move,int flag1,int flag2,int flag3)
 		moveRecord[Move] = true;
 	}
 }
-Vec2 GameScene::centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord) {
-	Size mapSize = (map->getMap())->getMapSize();//TileMap坐标的行数，列数
-	Size tileSize = (map->getMap())->getTileSize();//图块大小
-	int x = TileCoord.x * tileSize.width + tileSize.width / 2;
-	int y = (mapSize.height - TileCoord.y)*tileSize.height - tileSize.height / 2;
-	return Vec2(x, y);
-}
 
 bool GameScene::collide(Vec2 position,int type)
 {
@@ -538,17 +254,4 @@ void GameScene::giftcollide(float delta)
 }
 
 
-// 将屏幕坐标转换为TileMap坐标，暂时没用
-Vec2 GameScene::tileCoordForPosition(Vec2 position)
-{// CC_CONTENT_SCALE_FACTOR Retina返回2，否则返回1
- // 玩家位置的x除以地图的宽，得到的是地图横向的第几个格子（tile）
- // 地图宽计算：26[格子] * 64[图块的宽] = 1680[地图宽]
- // 假如精灵在的x坐标是640，则精灵所在地图的格子计算：640[精灵位置] / 64[图块的宽] = 10 [格子]
-	int x = (int)(position.x / ((map->getMap())->getTileSize().width / CC_CONTENT_SCALE_FACTOR()));
-	// 玩家位置的y除以地图的高，得到的是地图纵向第几个格子（tile），
-	// 但是因为cocos2d-x的y轴（左下角）和TileMap的y轴（左上角）轴相反，所以使用地图的高度减去玩家位置的y
-	float pointHeight = (map->getMap())->getTileSize().height / CC_CONTENT_SCALE_FACTOR();
-	int y = (int)(((map->getMap())->getMapSize().height * pointHeight - position.y) / pointHeight);
-	return Vec2(x,y);
-}
 

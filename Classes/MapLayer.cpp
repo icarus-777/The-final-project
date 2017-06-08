@@ -1,4 +1,5 @@
 #include "MapLayer.h"
+
 bool MapLayer::init()
 {
 	//显示地图
@@ -151,12 +152,5 @@ void MapLayer::create_BlockVector(Vector<Sprite*>& _breakableBlockVector, Vector
 			}
 		}
 	}
-}
-Vec2 MapLayer::centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord) {
-	Size mapSize = _map->getMapSize();//TileMap坐标的行数，列数
-	Size tileSize = _map->getTileSize();//图块大小
-	int x = TileCoord.x * tileSize.width + tileSize.width / 2;
-	int y = (mapSize.height - TileCoord.y)*tileSize.height - tileSize.height / 2;
-	return Vec2(x, y);
 }
 

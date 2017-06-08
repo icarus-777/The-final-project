@@ -6,11 +6,11 @@
 * create_BlockVector用来创建障碍物数组
 */
 #ifndef _MAP_LAYER_
-#define _MAP_LAYER
+#define _MAP_LAYER_
 
 #include "cocos2d.h"
 #include "SpriteGift.h"
-
+#include "position.h"
 USING_NS_CC;
 
 
@@ -30,8 +30,6 @@ public:
 	TMXTiledMap* getMap() { return _map; }
 	bool boom(Vec2 _BubblePosition[]);
 	bool judge_collide(Vec2 position);
-	//求方格的中心坐标  
-	Vec2 centerPositionForTileCoord(const cocos2d::Vec2 &TileCoord);
 
 	//在breakable的block上放一个精灵 这样就可以发生碰撞
 	void create_BlockVector(Vector<Sprite*> &_breakableBlockVector, Vector<SpriteGift*>& _giftVector);

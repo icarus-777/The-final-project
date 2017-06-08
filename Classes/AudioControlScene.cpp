@@ -105,13 +105,13 @@ bool AudioControl::init() {
 
 	auto* background = Sprite::create("BeginScene.png");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);  //设置位置
-	background->setScale(1.6f);//大小
+	background->setScale(1.5f);//大小
 	addChild(background, 0); //添加到场景
-	//返回主菜单按钮
+							 //返回主菜单按钮
 	auto* pSet = MenuItemImage::create("button4.1.png",
 		"button4.2.png",
 		this,
-		menu_selector(MenuSwitch::BackToMenu));
+		menu_selector(MenuSwitch::BackToLast));
 	auto* Set = Menu::create(pSet, NULL);
 	Set->setAnchorPoint(Vec2(0, 0));
 	Set->setPosition(850, visibleSize.height / 2 - 250);
