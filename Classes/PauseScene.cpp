@@ -32,10 +32,10 @@ bool PauseScene::init()
 	addChild(background, 0); //添加到场景
 
 							 //重新开始游戏按钮
-	auto* pStart = MenuItemImage::create("button1.1.png",
-		"button2.2.png",
+	auto* pStart = MenuItemImage::create("button5.png",
+		"button6.png",
 		this,
-		menu_selector(MenuSwitch::StartGame));
+		menu_selector(MenuSwitch::SelectMap));
 	auto* Start = Menu::create(pStart, NULL);
 	Start->setAnchorPoint(Vec2(0, 0));
 	Start->setPosition(850, size.height / 2 - 70);

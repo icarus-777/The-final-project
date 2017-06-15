@@ -1,9 +1,31 @@
 #include "MapLayer.h"
 
-bool MapLayer::init()
+bool MapLayer::init1(int a)
 {
+	_setMap = a;
 	//显示地图
-	_map = TMXTiledMap::create("Map.tmx");
+	if (_setMap == 1)
+	{
+		_map = TMXTiledMap::create("map1.tmx");
+		for (int i = 0; i < 12; i++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+					breakableBlocks[i][j] = breakableBlocks1[i][j];
+			}
+		}
+	}
+	else if (_setMap == 2)
+	{
+		_map = TMXTiledMap::create("map2.tmx");
+		for (int i = 0; i < 12; i++)
+		{
+			for (int j = 0; j < 16; j++)
+			{
+				breakableBlocks[i][j] = breakableBlocks2[i][j];
+			}
+		}
+	}
 	// 把地图的锚点和位置都设置为原点，这样可以使地图的左下角与屏幕的左下角对齐
 	//设置地图的锚点
 	_map->setAnchorPoint(Vec2::ZERO);
@@ -105,7 +127,6 @@ bool MapLayer::judge_collide(Vec2 position)
 }
 
 
-
 void MapLayer::create_BlockVector(Vector<Sprite*>& _breakableBlockVector, Vector<SpriteGift*>& _giftVector)
 {
 	srand((int)time(NULL));
@@ -124,33 +145,62 @@ void MapLayer::create_BlockVector(Vector<Sprite*>& _breakableBlockVector, Vector
 				this->addChild(test, 0);
 				if (m <= 10)
 				{//药水
-					SpriteGift* Gift1 = SpriteGift::create("Gift1.png");
+					SpriteGift* Gift1 = SpriteGift::create("Gift1_1.png");
 					Gift1->setAnchorPoint(Vec2(0.5, 0.5));
 					Gift1->setPosition(giftPosition);
 					_map->addChild(Gift1, 1);
 					Gift1->setTag(GIFT1);
 					_giftVector.pushBack(Gift1);
+					auto animate = getAnimateByName("Gift1_", 0.1f, 3);
+					auto repeatAnimate = RepeatForever::create(animate);
+					Gift1->runAction(repeatAnimate);
 				}
 				else if (m >= 15 && m <= 25)
 				{//鞋子
-					SpriteGift* Gift2 = SpriteGift::create("Gift2.png");
+					SpriteGift* Gift2 = SpriteGift::create("Gift2_1.png");
 					Gift2->setAnchorPoint(Vec2(0.5, 0.5));
 					Gift2->setPosition(giftPosition);
 					_map->addChild(Gift2, 1);
 					Gift2->setTag(GIFT2);
 					_giftVector.pushBack(Gift2);
+					auto animate = getAnimateByName("Gift2_", 0.1f, 3);
+					auto repeatAnimate = RepeatForever::create(animate);
+					Gift2->runAction(repeatAnimate);
 				}
 				else if (m >= 30 && m <= 50)
 				{//泡泡
-					SpriteGift* Gift3 = SpriteGift::create("Gift3.png");
+					SpriteGift* Gift3 = SpriteGift::create("Gift3_1.png");
 					Gift3->setAnchorPoint(Vec2(0.5, 0.5));
 					Gift3->setPosition(giftPosition);
 					_map->addChild(Gift3, 1);
 					Gift3->setTag(GIFT3);
 					_giftVector.pushBack(Gift3);
+					auto animate = getAnimateByName("Gift3_", 0.1f, 3);
+					auto repeatAnimate = RepeatForever::create(animate);
+					Gift3->runAction(repeatAnimate);
 				}
 			}
 		}
 	}
 }
+Animate * MapLayer::getAnimateByName(std::string animName, float delay, int animNum)
+{
+	// 创建一个动画
+	Animation* animation = Animation::create();
+	// 循环从精灵帧缓存中获取与图片名称相对应的精灵帧组成动画
+	for (unsigned int i = 1; i <= animNum; i++) {
+		std::string frameName = animName;
 
+		//在动画帧名称后加上序号
+		frameName.append(StringUtils::format("%d", i)).append(".png");
+		animation->addSpriteFrameWithFile(frameName.c_str());
+	}
+	//设置动画延时
+	animation->setDelayPerUnit(delay);
+
+	//在播放完动画时恢复到初始帧
+	animation->setRestoreOriginalFrame(true);
+	Animate* animate = Animate::create(animation);
+
+	return animate;
+}

@@ -1,20 +1,37 @@
 #include"Player.h"
 
-bool Player::init()
+bool Player::init1(int a)
 {
-	_player = Sprite::create("player_down_1.png");
-	_player->setAnchorPoint(_player->getAnchorPoint() + Vec2(0, -0.5));
-	_player_texture_left = CCTextureCache::sharedTextureCache()->addImage("player_left_1.png");
-	_player_texture_right = CCTextureCache::sharedTextureCache()->addImage("player_right_1.png");
-	_player_texture_up = CCTextureCache::sharedTextureCache()->addImage("player_up_1.png");
-	_player_texture_down = CCTextureCache::sharedTextureCache()->addImage("player_down_1.png");
-	this->addChild(_player);
+	_setPlayer = a;
+	if (_setPlayer == 1)
+	{
+		_player = Sprite::create("player_down_1.png");
+		_player->setAnchorPoint(_player->getAnchorPoint() + Vec2(0, -0.5));
+		_player_texture_left = CCTextureCache::sharedTextureCache()->addImage("player_left_1.png");
+		_player_texture_right = CCTextureCache::sharedTextureCache()->addImage("player_right_1.png");
+		_player_texture_up = CCTextureCache::sharedTextureCache()->addImage("player_up_1.png");
+		_player_texture_down = CCTextureCache::sharedTextureCache()->addImage("player_down_1.png");
+		this->addChild(_player);
+	}
+	else if (_setPlayer == 2)
+	{
+		_player = Sprite::create("player2_down_1.png");
+		_player->setAnchorPoint(_player->getAnchorPoint() + Vec2(0, -0.5));
+		_player_texture_left = CCTextureCache::sharedTextureCache()->addImage("player2_left_1.png");
+		_player_texture_right = CCTextureCache::sharedTextureCache()->addImage("player2_right_1.png");
+		_player_texture_up = CCTextureCache::sharedTextureCache()->addImage("player2_up_1.png");
+		_player_texture_down = CCTextureCache::sharedTextureCache()->addImage("player2_down_1.png");
+		this->addChild(_player);
+	}
+	
 	return true;
 }
 void Player::ForeverMove(int code) {
 
 	Animate* animate;
 	std::string Name = "player";
+	if(_setPlayer == 2)
+		Name = "player2";
 	_player->stopAllActions();
 	switch (code) {
 	case keyBoard_left:
@@ -71,4 +88,40 @@ Animate * Player::getAnimateByName(std::string animName, float delay, int animNu
 
 	return animate;
 }
+
+Animate * Player::die()
+{
+	auto animation = Animation::create();
+	if (_setPlayer == 1)
+	{
+		for (int i = 1; i <= 11; i++) {
+				animation->addSpriteFrameWithFileName(StringUtils::format("player_die_%d.png", i));
+			}
+	}
+	else if (_setPlayer == 2)
+	{
+		for (int i = 1; i <= 11; i++) {
+			animation->addSpriteFrameWithFileName(StringUtils::format("player2_die_%d.png", i));
+		}
+	}
+	// 设置动画播放的属性，3秒/15帧
+	animation->setDelayPerUnit(1.0f / 3.0f);
+	// 让精灵对象在动画执行完后恢复到最初状态
+	animation->setRestoreOriginalFrame(false);
+	auto action = Animate::create(animation);
+	return action;
+}
+
+void Player::setdie()
+{
+	isalive = false;
+}
+
+bool Player::getisalive()
+{
+	return isalive;
+}
+
+
+
 

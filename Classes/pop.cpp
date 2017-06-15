@@ -36,7 +36,7 @@ Sequence* Pop::centerBoom2()
 	return action;
 }
 
-void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector, MapLayer*& map)
+void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector, MapLayer*& map, Vector<Sprite*>&_pop)
 {
 	//临时动作数组
 	Vector<Action*> leftAction;
@@ -92,6 +92,7 @@ void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector
 			auto sprite = Sprite::create();
 			sprite->setPosition(Vec2(popx->getPositionX() + 40 * i, popx->getPositionY()));
 			rightSprite.pushBack(sprite);//将精灵放入数组
+			_pop.pushBack(sprite);
 			map->getMap()->addChild(sprite, 10);
 			if (rightWaterLength != i)//水柱中间的动画
 			{
@@ -126,6 +127,7 @@ void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector
 			auto sprite = Sprite::create();
 			sprite->setPosition(Vec2(popx->getPositionX() - 40 * i, popx->getPositionY()));
 			leftSprite.pushBack(sprite);//将精灵放入数组
+			_pop.pushBack(sprite);
 			map->getMap()->addChild(sprite, 10);
 			if (leftWaterLength != i)//水柱中间的动画
 			{
@@ -159,6 +161,7 @@ void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector
 			auto sprite = Sprite::create();
 			sprite->setPosition(Vec2(popx->getPositionX(), popx->getPositionY() + 40 * i));
 			upSprite.pushBack(sprite);//将精灵放入数组
+			_pop.pushBack(sprite);
 			map->getMap()->addChild(sprite, 10);
 			if (upWaterLength != i)//水柱中间的动画
 			{
@@ -192,6 +195,7 @@ void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector
 			auto sprite = Sprite::create();
 			sprite->setPosition(Vec2(popx->getPositionX(), popx->getPositionY() - 40 * i));
 			downSprite.pushBack(sprite);//将精灵放入数组
+			_pop.pushBack(sprite);
 			map->getMap()->addChild(sprite, 10);
 			if (downWaterLength != i)//水柱中间的动画
 			{

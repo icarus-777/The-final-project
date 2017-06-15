@@ -6,12 +6,13 @@
 #include "BeginScene.h"
 #include "AudioControlScene.h"
 #include "PauseScene.h"
-
+#include "Select.h"
 class MenuSwitch : public cocos2d::Layer
 {
 public:
-	//开始游戏菜单
-	void StartGame(cocos2d::Object* pSender);
+
+	//选择地图和人物
+	void SelectMap(cocos2d::Object* pSender);
 	//结束游戏菜单
 	void ExitGame(cocos2d::Ref* pSender);
 	//返回主菜单

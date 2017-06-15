@@ -103,7 +103,7 @@ bool AudioControl::init() {
 	});
 	this->addChild(effects_slider,1);
 
-	auto* background = Sprite::create("BeginScene.png");
+	auto* background = Sprite::create("background2.png");
 	background->setPosition(visibleSize.width / 2, visibleSize.height / 2);  //设置位置
 	background->setScale(1.5f);//大小
 	addChild(background, 0); //添加到场景

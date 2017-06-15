@@ -1,11 +1,13 @@
 #include "MenuSwitch.h"
 
 USING_NS_CC;
-void MenuSwitch::StartGame(cocos2d::Object* pSender)
+
+
+void MenuSwitch::SelectMap(cocos2d::Object * pSender)
 {
 	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
-	auto transition = TransitionSplitRows::create(0.5, GameScene::createScene());///创建场景转换
-	Director::getInstance()->replaceScene(transition);//转到游戏界面
+	auto transition = TransitionSplitRows::create(1.0, Select::createScene());///创建场景转换
+	Director::getInstance()->replaceScene(transition);
 }
 
 void MenuSwitch::ExitGame(Ref* pSender)
@@ -21,7 +23,7 @@ void MenuSwitch::BackToLast(cocos2d::Ref* pSender)
 void MenuSwitch::GameSet(cocos2d::Ref* pSender)
 {
 	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
-	auto transition = TransitionFadeTR::create(0.5, AudioControl::createScene());///创建场景转换
+	auto transition = TransitionFadeTR::create(1.0, AudioControl::createScene());///创建场景转换
 	Director::getInstance()->pushScene(transition);
 }
 void MenuSwitch::Continue(cocos2d::Ref* pSender)
@@ -32,6 +34,6 @@ void MenuSwitch::Continue(cocos2d::Ref* pSender)
 void MenuSwitch::Break(cocos2d::Ref* pSender)
 {
 	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
-	auto transition = TransitionProgressInOut::create(0.5,PauseScene::createScene());///创建场景转换
+	auto transition = TransitionProgressInOut::create(1.0,PauseScene::createScene());///创建场景转换
 	Director::getInstance()->pushScene(transition);
 }

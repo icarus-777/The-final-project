@@ -1,8 +1,12 @@
 #include "GameScene.h"
 
 USING_NS_CC;
-Scene* GameScene::createScene()
+static int _currentplayer = 1;  
+static int _currentmap = 1;
+Scene* GameScene::createScene(int selectplayer,int selectmap)
 {
+	_currentplayer = selectplayer;
+	_currentmap = selectmap;
 	// 创建一个场景对象
 	auto scene = Scene::create();
 	// 创建层对象
@@ -24,9 +28,13 @@ bool GameScene::init()
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 
 	//显示地图
-	  map = MapLayer::create();
-	  map->setScale(1.5f);
-    addChild(map, 0);
+	 map = MapLayer::create();
+	 map->init1(_currentmap);
+	 map->setAnchorPoint(Vec2::ZERO);
+	 //设置地图位置
+	 map->setPosition(0, 0);
+	 map->setScale(1.5f);
+	 this->addChild(map, 0);
 	//暂停按钮
 	auto* pBreak = MenuItemImage::create("pause 1.png",
 		"pause 2.png",
@@ -42,12 +50,13 @@ bool GameScene::init()
 	ValueMap mapPlayer = objects->getObject("player");
 	int x = mapPlayer.at("x").asInt();
 	int y = mapPlayer.at("y").asInt();
-	_player =Player::create();
+	_player = Player::create();
+	_player->init1(_currentplayer);
 	// 设置位置并添加为地图的子节点
 	_player->setPosition(x, y);
 	_player->setAnchorPoint(_player->getAnchorPoint() + Vec2(0, -0.5));
 	map->getMap()->addChild(_player, 4);
-
+	
 	map->create_BlockVector(_breakableBlockVector, _giftVector);
 	// 创建键盘事件监听器
 	key = KeyBoard::create();
@@ -65,6 +74,7 @@ void GameScene::update(float delta) {
 	keyPressedDuration(delta);
 	//判断是否碰到道具
 	giftcollide(delta);
+	collisionDetection(delta);
 }
 
 //键盘按下后的事情
@@ -109,7 +119,7 @@ void GameScene::keyPressedDuration(float delta) {
 				auto popx = _popVector.at(0);//获得第一个泡泡
 				Vec2 popPosition = popx->getPosition();
 				popx->runAction(pop->centerBoom2());
-				popx->destroy(power,popx, _breakableBlockVector,map);
+				popx->destroy(power,popx, _breakableBlockVector,map, _pop);
 				SimpleAudioEngine::getInstance()->playEffect("explode.wav");
 				map->boom(popx->setBubblePosition(power, popPosition));
 			});
@@ -252,6 +262,32 @@ void GameScene::giftcollide(float delta)
 		}
 	}
 }
-
+void GameScene::collisionDetection(float delta) {
+	Vec2 playerposition = _player->getPosition();
+	Vec2 playerPositionForTileMap = tileCoordForPosition(playerposition);
+	for (unsigned i = 0; i < _pop.size(); ++i) {
+		Vec2 Position = _pop.at(i)->getPosition();
+		Vec2 PositionForTileMap = tileCoordForPosition(Position);
+		if (PositionForTileMap == playerPositionForTileMap) {
+			auto sprite = Sprite::create();
+			sprite->setPosition(_player->getPosition());
+			sprite->setAnchorPoint(Vec2(0.5,0));
+			map->getMap()->addChild(sprite,11);
+			sprite->runAction(_player->die());
+			_player->setZOrder(0);
+			_player->setdie();
+			this->removeChild(key);
+			_pop.clear();
+		}
+	}
+	_pop.clear();
+	if (_player->getisalive() == false)
+	{
+		auto sprite = Sprite::create("lose.png");
+		sprite->setAnchorPoint(Vec2(0.5, 0.5));
+		sprite->setPosition(350,240);
+		map->getMap()->addChild(sprite, 11);
+	}
+}
 
 

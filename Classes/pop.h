@@ -26,7 +26,7 @@ public:
 	}
 	Animate* centerBoom1();
 	Sequence* centerBoom2();
-	void destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector, MapLayer*& map);
+	void destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector, MapLayer*& map, Vector<Sprite*>&_pop);
 	bool collide(Vec2 position, int type, Vector<Sprite*>& _breakableBlockVector, MapLayer*& map);
 	Vec2* setBubblePosition(int& power, Vec2 popPosition);
 };

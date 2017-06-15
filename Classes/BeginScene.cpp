@@ -36,7 +36,7 @@ bool BeginScene::init()
 	auto* pStart = MenuItemImage::create("button1.1.png",
 		"button2.2.png",
 		this,
-		menu_selector(MenuSwitch::StartGame));
+		menu_selector(MenuSwitch::SelectMap));
 	auto* Start = Menu::create(pStart, NULL);
 	Start->setAnchorPoint(Vec2(0, 0));
 	Start->setPosition(850, size.height / 2 - 70);

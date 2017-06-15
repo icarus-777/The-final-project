@@ -14,7 +14,7 @@ class GameScene : public cocos2d::Layer
 {
 public:
 	//创建Scene场景
-	static cocos2d::Scene* createScene();
+	static cocos2d::Scene* createScene(int selectplayer,int selectmap);
 	//init函数，完成初始化操作
 	virtual bool init();
 	//键盘按下后的事情
@@ -33,8 +33,9 @@ public:
 	bool collide(Vec2 position,int type);
 	//判断是否碰到道具
 	void giftcollide(float delta);
+	void collisionDetection(float delta);
 private:
-
+	Vector<Sprite*>_pop;
 	//键盘按键记录
 	KeyBoard *key;
 	MapLayer * map;  // 地图
