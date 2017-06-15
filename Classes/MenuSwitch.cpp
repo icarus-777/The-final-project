@@ -37,3 +37,9 @@ void MenuSwitch::Break(cocos2d::Ref* pSender)
 	auto transition = TransitionProgressInOut::create(1.0,PauseScene::createScene());///创建场景转换
 	Director::getInstance()->pushScene(transition);
 }
+void MenuSwitch::BackToMenu(cocos2d::Ref* pSender) {
+	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
+	auto transition = TransitionFadeTR::create(0.5, BeginScene::createScene());///创建场景转换
+	Director::getInstance()->replaceScene(transition);
+}
+

@@ -36,7 +36,12 @@ Sequence* Pop::centerBoom2()
 	return action;
 }
 
+<<<<<<< HEAD
 void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector, MapLayer*& map, Vector<Sprite*>&_pop)
+=======
+void Pop::destroy(int& power, Pop*& popx, Vector<Sprite*>& _breakableBlockVector,
+	MapLayer*& map,Vector<Sprite*>&_pop)
+>>>>>>> origin/master
 {
 	//临时动作数组
 	Vector<Action*> leftAction;
