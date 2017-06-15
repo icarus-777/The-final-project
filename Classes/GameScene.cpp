@@ -65,6 +65,7 @@ void GameScene::update(float delta) {
 	keyPressedDuration(delta);
 	//判断是否碰到道具
 	giftcollide(delta);
+	collisionDetection(delta);
 }
 
 //键盘按下后的事情
@@ -109,7 +110,7 @@ void GameScene::keyPressedDuration(float delta) {
 				auto popx = _popVector.at(0);//获得第一个泡泡
 				Vec2 popPosition = popx->getPosition();
 				popx->runAction(pop->centerBoom2());
-				popx->destroy(power,popx, _breakableBlockVector,map);
+				popx->destroy(power,popx, _breakableBlockVector,map,_pop);
 				SimpleAudioEngine::getInstance()->playEffect("explode.wav");
 				map->boom(popx->setBubblePosition(power, popPosition));
 			});
@@ -251,6 +252,45 @@ void GameScene::giftcollide(float delta)
 			_giftVector.eraseObject(erase);
 		}
 	}
+}
+void GameScene::collisionDetection(float delta) {
+	//log("%d", _pop.size());
+	for (unsigned i = 0; i < _pop.size(); ++i) {
+		Sprite *pop = _pop.at(i);
+		if (_player->getBoundingBox().intersectsRect(pop->getBoundingBox())) {
+			playAnimate();
+			Fail();
+		}
+	}
+	_pop.clear();
+}
+void GameScene::playAnimate() {
+		auto animation = Animation::create();
+		auto sprite = Sprite::create();
+		sprite->setPosition(_player->getPosition());
+		for (int j = 1; j <= 11; ++j) {
+			animation->addSpriteFrameWithFileName(StringUtils::format("Role1Die_%d.png", j));
+		//	log("%d", j);
+		}
+		animation->setDelayPerUnit(0.1f);
+		auto animate = Animate::create(animation);
+		auto hide = Hide::create();
+		auto delay = DelayTime::create(0.f);
+		auto action = Sequence::create(delay, animate, hide, NULL);
+		sprite->runAction(action);
+		this->addChild(sprite);
+}
+void GameScene::Pass()
+{
+	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
+	auto transition = TransitionFadeTR::create(0.5, PassTheGame::createScene());///创建场景转换
+	Director::getInstance()->replaceScene(transition);
+}
+void GameScene::Fail()
+{
+	SimpleAudioEngine::getInstance()->playEffect("lay.wav");
+	auto transition = TransitionFadeTR::create(0.5, FailTheGame::createScene());///创建场景转换
+	Director::getInstance()->replaceScene(transition);
 }
 
 

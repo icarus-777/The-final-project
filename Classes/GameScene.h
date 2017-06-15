@@ -8,6 +8,8 @@
 #include "AudioControlScene.h"
 #include "MenuSwitch.h"
 #include "pop.h"
+#include "Fail.h"
+#include "PassTheGame.h"
 
 USING_NS_CC;
 class GameScene : public cocos2d::Layer
@@ -33,6 +35,10 @@ public:
 	bool collide(Vec2 position,int type);
 	//判断是否碰到道具
 	void giftcollide(float delta);
+	void playAnimate();
+	void collisionDetection(float delta);
+	void Fail();
+	void Pass();
 private:
 
 	//键盘按键记录
@@ -42,6 +48,7 @@ private:
 	Vector<Pop*> _popVector;//泡泡层
 	Vector<Sprite*> _breakableBlockVector;//可爆炸物数组
 	Vector<SpriteGift*> _giftVector;//道具数组
+	Vector<Sprite*>_pop;
 	int power = 1;//泡泡威力
 	int popMax = 1;//泡泡最大数量
 	double addSpeed = 0;//吃鞋子后增加的速度

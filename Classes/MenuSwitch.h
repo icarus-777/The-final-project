@@ -22,6 +22,8 @@ public:
 	void Continue(cocos2d::Ref* pSender);
 	//暂停游戏
 	void Break(cocos2d::Ref* pSender);
+	//返回主菜单
+	void BackToMenu(cocos2d::Ref* pSender);
 };
 
 #endif 
